@@ -51,11 +51,71 @@
                     <de.hdodenhof.circleimageview.CircleImageView
                         android:layout_width="@dimen/avatar_size"
                         android:layout_height="@dimen/avatar_size"
-                        app:imageUrl="@{viewModel.imageUrl}"
-                        />
+                        app:civ_border_color="@color/colorPrimary"
+                        app:civ_border_width="1dp"
+                        app:imageResource="@{viewModel.selectedTheme.photoId}" />
+
+                    <View
+                        android:layout_width="@dimen/indicator_size"
+                        android:layout_height="@dimen/indicator_size"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginEnd="@dimen/indicator_margin"
+                        android:layout_marginRight="@dimen/indicator_margin"
+                        android:layout_marginTop="@dimen/indicator_margin"
+                        android:background="@drawable/shape_online" />
 
                 </RelativeLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="@dimen/activity_vertical_margin"
+                    android:layout_marginStart="@dimen/activity_vertical_margin"
+                    android:layout_toEndOf="@+id/avatarLayout"
+                    android:layout_toRightOf="@+id/avatarLayout"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/NameTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{viewModel.selectedTheme.name}" />
+
+                    <TextView
+                        style="@style/StatusTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{viewModel.selectedTheme.desk}" />
+
+                </LinearLayout>
             </RelativeLayout>
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="@dimen/activity_horizontal_margin_half" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <include
+                    layout="@layout/item_player"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:visibility="visible"
+                    />
+            </LinearLayout>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:configuration="@{viewModel.recyclerConfiguration}"/>
+
         </LinearLayout>
 
 

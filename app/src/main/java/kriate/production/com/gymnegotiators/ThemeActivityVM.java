@@ -19,24 +19,10 @@ public class ThemeActivityVM  extends ActivityViewModel<ThemeActivity> {
     public ThemeActivityVM(ThemeActivity activity, String status) {
         super(activity);
 
-        theme.set(Demo.getThemies().get(0));
-        photo.set("@drawable/boss");
+        selectedTheme.set(Loader.getThemies().get(0));
     }
 
-    public final ObservableField<Theme> theme = new ObservableField<>();
-    public final ObservableField<String> photo = new ObservableField<>();
+    public final ObservableField<Theme> selectedTheme = new ObservableField<>();
 
-    public String getImageUrl() {
-        // The URL will usually come from a model (i.e Profile)
-        return "http://cdn.meme.am/instances/60677654.jpg";
-    }
-
-    @BindingAdapter({"bind:imageUrl"})
-    public static void loadImage(ImageView view, String imageUrl) {
-        Picasso.with(view.getContext())
-                .load(imageUrl)
-                .placeholder(R.drawable.list)
-                .into(view);
-    }
 }
 

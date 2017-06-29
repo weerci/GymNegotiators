@@ -5,48 +5,29 @@ package kriate.production.com.gymnegotiators.Model;
  */
 
 public class Theme {
-
-    public Theme(int id, String phrase, int photo, int audio) {
-        this.id = id;
-        this.phrase = phrase;
-        this.photo = photo;
-        this.audio = audio;
+    public Theme(String name, String desk, int photoId, int audioId) {
+        this.name = name;
+        this.desk = desk;
+        this.photoId = photoId;
+        this.audioId = audioId;
     }
 
-    private int id;
-    private String phrase;
-    private int photo;
-    private int audio;
+    private String name;
+    private String desk;
+    private int photoId;
+    private int audioId;
 
-    public int getId() {
-        return id;
+    public String getName() {
+        return name;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public String getDesk() {
+        return desk;
     }
-
-    public String getPhrase() {
-        return phrase;
+    public int getPhotoId() {
+        return photoId;
     }
-
-    public void setPhrase(String phrase) {
-        this.phrase = phrase;
-    }
-
-    public int getPhoto() {
-        return photo;
-    }
-
-    public void setPhoto(int photo) {
-        this.photo = photo;
-    }
-
-    public int getAudio() {
-        return audio;
-    }
-
-    public void setAudio(int audio) {
-        this.audio = audio;
+    public int getAudioId() {
+        return audioId;
     }
 }
