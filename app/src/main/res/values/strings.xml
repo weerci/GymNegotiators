@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">Тренажер переговорщика</string>
     <string name="action_settings">Настройки</string>
+    <string name="listen">Слушать</string>
+    <string name="buy">Купить</string>
+    <string name="already_friends">Куплено</string>
+
 </resources>
