@@ -9,30 +9,37 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class ThemeActivity extends AppCompatActivity {
+import com.stfalcon.androidmvvmhelper.mvvm.activities.BindingActivity;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_theme);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+import kriate.production.com.gymnegotiators.databinding.ActivityThemeBinding;
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-    }
+public class ThemeActivity extends BindingActivity<ActivityThemeBinding, ThemeActivityVM> {
+
+    private static final String KEY_STATUS = "STATUS";
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_theme, menu);
         return true;
+    }
+
+    @Override
+    public ThemeActivityVM onCreate() {
+        setSupportActionBar(getBinding().toolbar);
+
+        return new ThemeActivityVM(this, KEY_STATUS);
+
+    }
+
+    @Override
+    public int getVariable() {
+        return kriate.production.com.gymnegotiators.BR.viewModel;
+    }
+
+    @Override
+    public int getLayoutId() {
+        return R.layout.activity_theme;
     }
 
     @Override
