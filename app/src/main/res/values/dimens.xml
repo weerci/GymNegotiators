@@ -12,5 +12,6 @@
     <dimen name="indicator_margin">5dp</dimen>
 
     <dimen name="small_progressbar_size">30dp</dimen>
+    <dimen name="photo_item_padding">4dp</dimen>
 
 </resources>

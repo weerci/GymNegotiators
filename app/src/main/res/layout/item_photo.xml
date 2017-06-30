@@ -1,0 +1,33 @@
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="name"
+            type="java.lang.String"/>
+        <variable
+            name="photoId"
+            type="java.lang.Integer"/>
+    </data>
+
+    <kriate.production.com.gymnegotiators.ui.SquareRelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/photo_item_padding">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/colorPrimary"
+            android:orientation="vertical"
+            android:padding="1dp"
+            >
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                app:imageResource="@{photoId}"/>
+        </LinearLayout>
+    </kriate.production.com.gymnegotiators.ui.SquareRelativeLayout>
+
+</layout>

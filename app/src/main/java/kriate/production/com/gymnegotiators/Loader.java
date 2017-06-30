@@ -23,9 +23,12 @@ public final class Loader {
     public static ArrayList<Theme> getThemies() {
         ArrayList<Theme> themes = new ArrayList<>();
 
+        themes.add(new Theme(App.getContext().getString(R.string.list_head), App.getContext().getString(R.string.list_desk), R.drawable.list, R.raw.list));
+        themes.add(new Theme(App.getContext().getString(R.string.buyer_head), App.getContext().getString(R.string.buyer_desk), R.drawable.buyer, R.raw.buyer));
         themes.add(new Theme(App.getContext().getString(R.string.seller_head), App.getContext().getString(R.string.seller_desk), R.drawable.seller, R.raw.seller));
+        themes.add(new Theme(App.getContext().getString(R.string.employer_head), App.getContext().getString(R.string.employer_desk), R.drawable.employee, R.raw.employee));
+        themes.add(new Theme(App.getContext().getString(R.string.boss_head), App.getContext().getString(R.string.boss_desk), R.drawable.boss, R.raw.boss));
 
         return themes;
     }
-
 }
