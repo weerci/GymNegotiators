@@ -4,6 +4,10 @@ import android.os.Build;
 import android.support.annotation.RequiresApi;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
+
 import kriate.production.com.gymnegotiators.Model.Theme;
 
 /**
@@ -20,15 +24,17 @@ public final class Loader {
             "Руководитель сотруднику: - Какой мозговой барьер помешал Вам выполнить эту задачу?"
     };
 
-    public static ArrayList<Theme> getThemies() {
-        ArrayList<Theme> themes = new ArrayList<>();
 
-        themes.add(new Theme(App.getContext().getString(R.string.list_head), App.getContext().getString(R.string.list_desk), R.drawable.list, R.raw.list));
-        themes.add(new Theme(App.getContext().getString(R.string.buyer_head), App.getContext().getString(R.string.buyer_desk), R.drawable.buyer, R.raw.buyer));
-        themes.add(new Theme(App.getContext().getString(R.string.seller_head), App.getContext().getString(R.string.seller_desk), R.drawable.seller, R.raw.seller));
-        themes.add(new Theme(App.getContext().getString(R.string.employer_head), App.getContext().getString(R.string.employer_desk), R.drawable.employee, R.raw.employee));
-        themes.add(new Theme(App.getContext().getString(R.string.boss_head), App.getContext().getString(R.string.boss_desk), R.drawable.boss, R.raw.boss));
+    private static TreeMap<String, Theme> mapTheme = new TreeMap<String, Theme>() {{
+        put("kriate.production.com.gymnegotiators.list_inapp", new Theme(App.getContext().getString(R.string.list_head), App.getContext().getString(R.string.list_desk), R.drawable.list, R.raw.list));
+        put("kriate.production.com.gymnegotiators.buyer_inapp", new Theme(App.getContext().getString(R.string.buyer_head), App.getContext().getString(R.string.buyer_desk), R.drawable.buyer, R.raw.buyer));
+        put("kriate.production.com.gymnegotiators.seller_inapp", new Theme(App.getContext().getString(R.string.seller_head), App.getContext().getString(R.string.seller_desk), R.drawable.seller, R.raw.seller));
+        put("kriate.production.com.gymnegotiators.employer_inapp", new Theme(App.getContext().getString(R.string.employer_head), App.getContext().getString(R.string.employer_desk), R.drawable.employee, R.raw.employee));
+        put("kriate.production.com.gymnegotiators.boss_inapp", new Theme(App.getContext().getString(R.string.boss_head), App.getContext().getString(R.string.boss_desk), R.drawable.boss, R.raw.boss));
+    }};
 
-        return themes;
+    public static TreeMap<String, Theme> getMapTheme()
+    {
+        return mapTheme;
     }
 }

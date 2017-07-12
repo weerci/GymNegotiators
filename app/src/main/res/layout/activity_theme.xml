@@ -8,6 +8,11 @@
         <variable
             name="viewModel"
             type="kriate.production.com.gymnegotiators.ThemeActivityVM" />
+
+        <import
+            alias="v"
+            type="android.view.View" />
+
     </data>
 
     <android.support.design.widget.CoordinatorLayout
@@ -101,20 +106,53 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <include
-                    layout="@layout/item_player"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:visibility="visible"
-                    />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+                    >
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:visibility="@{viewModel.isLoading ? v.GONE : v.VISIBLE}">
+
+                        <Button
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Купить"
+                            android:theme="@style/AccentButton"
+                            android:visibility="@{viewModel.selectedTheme.isPurchased ? v.GONE : v.VISIBLE}"
+                            app:onClick="@{viewModel::buyTheme}" />
+
+                        <Button
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Продать"
+                            android:theme="@style/AccentButton"
+                            android:visibility="@{viewModel.selectedTheme.isPurchased ? v.VISIBLE : v.GONE}"
+                            app:onClick="@{viewModel::buyTheme}" />
+                    </LinearLayout>
+
+                    <ProgressBar
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/small_progressbar_size"
+                        android:layout_gravity="center"
+                        android:layout_weight="1"
+                        android:visibility="@{viewModel.isLoading ? v.VISIBLE : v.GONE}" />
+
+                </LinearLayout>
             </LinearLayout>
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recycler"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:configuration="@{viewModel.recyclerConfiguration}"/>
+                app:configuration="@{viewModel.recyclerConfiguration}" />
 
         </LinearLayout>
 

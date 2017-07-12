@@ -27,7 +27,6 @@ public final class BindingAdapters {
 
     @BindingAdapter("app:onClick")
     public static void bindOnClick(View view, final Runnable runnable) {
-        return;
-        //view.setOnClickListener(v -> runnable.run());
+        view.setOnClickListener(v -> runnable.run());
     }
 }

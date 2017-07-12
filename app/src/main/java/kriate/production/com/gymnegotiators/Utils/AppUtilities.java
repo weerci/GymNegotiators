@@ -1,4 +1,4 @@
-package kriate.production.com.gymnegotiators;
+package kriate.production.com.gymnegotiators.Utils;
 
 import android.app.Activity;
 import android.content.Context;

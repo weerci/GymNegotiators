@@ -1,8 +1,13 @@
 package kriate.production.com.gymnegotiators;
 
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import com.stfalcon.androidmvvmhelper.mvvm.activities.BindingActivity;
+
+import org.solovyev.android.checkout.Inventory;
+
 import kriate.production.com.gymnegotiators.databinding.ActivityThemeBinding;
 
 
@@ -21,7 +26,6 @@ public class ThemeActivity extends BindingActivity<ActivityThemeBinding, ThemeAc
     public ThemeActivityVM onCreate() {
         setSupportActionBar(getBinding().toolbar);
         return new ThemeActivityVM(this, KEY_STATUS);
-
     }
 
     @Override
@@ -48,4 +52,5 @@ public class ThemeActivity extends BindingActivity<ActivityThemeBinding, ThemeAc
 
         return super.onOptionsItemSelected(item);
     }
+
 }
