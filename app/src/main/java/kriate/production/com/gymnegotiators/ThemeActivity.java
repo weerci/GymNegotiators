@@ -8,6 +8,8 @@ import com.stfalcon.androidmvvmhelper.mvvm.activities.BindingActivity;
 
 import org.solovyev.android.checkout.Inventory;
 
+import java.io.IOException;
+
 import kriate.production.com.gymnegotiators.databinding.ActivityThemeBinding;
 
 
@@ -25,6 +27,7 @@ public class ThemeActivity extends BindingActivity<ActivityThemeBinding, ThemeAc
     @Override
     public ThemeActivityVM onCreate() {
         setSupportActionBar(getBinding().toolbar);
+
         return new ThemeActivityVM(this, KEY_STATUS);
     }
 

@@ -1,19 +1,12 @@
 package kriate.production.com.gymnegotiators;
 
 import android.app.Application;
-import android.content.Context;
-import android.widget.Toast;
 
 import org.solovyev.android.checkout.Billing;
-import org.solovyev.android.checkout.Cache;
-import org.solovyev.android.checkout.Checkout;
-import org.solovyev.android.checkout.Inventory;
-import org.solovyev.android.checkout.PlayStoreListener;
-import org.solovyev.android.checkout.PurchaseVerifier;
-
-import java.util.concurrent.Executor;
-
 import kriate.production.com.gymnegotiators.Utils.Encryption;
+import kriate.production.com.gymnegotiators.fit.FitService;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Created by dima on 30.06.2017.
@@ -31,6 +24,12 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         billing.connect();
+
+        retrofit = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        fitService = retrofit.create(FitService.class);
     }
 
     // Context
@@ -62,5 +61,17 @@ public class App extends Application {
     public Billing getBilling() {
         return billing;
     }
+    //endregion
+
+    static final String BASE_URL = "http://www.kriate.ru/";
+    private static FitService fitService;
+    private Retrofit retrofit;
+
+    public static FitService getFitService() {
+        return fitService;
+    }
+    //region Fit
+
+
     //endregion
 }

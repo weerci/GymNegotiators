@@ -7,6 +7,7 @@ import android.databinding.ObservableField;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,7 @@ import org.solovyev.android.checkout.Purchase;
 import org.solovyev.android.checkout.RequestListener;
 import org.solovyev.android.checkout.Sku;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -38,6 +40,10 @@ import kriate.production.com.gymnegotiators.Model.Theme;
 import kriate.production.com.gymnegotiators.Utils.AppUtilities;
 import kriate.production.com.gymnegotiators.binding.RecyclerBindingAdapter;
 import kriate.production.com.gymnegotiators.binding.RecyclerConfiguration;
+import kriate.production.com.gymnegotiators.fit.Content;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * Created by dima on 27.06.2017.
@@ -45,40 +51,29 @@ import kriate.production.com.gymnegotiators.binding.RecyclerConfiguration;
 
 public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
 
-
-    private ActivityCheckout mCheckout;
-
-    private static List<String> getInAppSkus() {
-        final List<String> skus = new ArrayList<>();
-        skus.addAll(Arrays.asList(
-                "kriate.production.com.gymnegotiators.boss_inapp",
-                "kriate.production.com.gymnegotiators.buyer_inapp",
-                "kriate.production.com.gymnegotiators.seller_inapp",
-                "kriate.production.com.gymnegotiators.employer_inapp"
-        ));
-        return skus;
-    }
-
     public ThemeActivityVM(ThemeActivity activity, String status) {
         super(activity);
 
         selectedTheme.set(Loader.getMapTheme().firstEntry().getValue());
         initRecycler();
 
+        App.getFitService().getAllContent().enqueue(new Callback<List<Content>>() {
+            @Override
+            public void onResponse(Call<List<Content>> call, Response<List<Content>> response) {
+                AppUtilities.showSnackbar(activity, "Успешно завершился запрос", false);
+            }
+            @Override
+            public void onFailure(Call<List<Content>> call, Throwable t) {
+                AppUtilities.showSnackbar(activity, "Ошибка произошла", false);
+            }
+        });
+
+/*
         final Billing billing = App.getContext().getBilling();
         mCheckout = Checkout.forActivity(activity, billing);
         mCheckout.start();
         reloadInventory();
-    }
-
-
-    private void reloadInventory() {
-        final Inventory.Request request = Inventory.Request.create();
-        // load purchase info
-        request.loadAllPurchases();
-        // load SKU details
-        request.loadSkus(ProductTypes.IN_APP, getInAppSkus());
-        mCheckout.loadInventory(request, new InventoryCallback());
+*/
     }
 
     @Override
@@ -125,6 +120,7 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
         return adapter;
     }
 
+    //Производится покупка выбранной темы**
     public void buyTheme() {
         Sku sku = selectedTheme.get().getSku();
         if (sku != null) {
@@ -142,8 +138,28 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
 
     //region Billing
 
-    Inventory.Product mProduct;
+    private ActivityCheckout mCheckout;
 
+    Inventory.Product mProduct;
+    private static List<String> getInAppSkus() {
+        final List<String> skus = new ArrayList<>();
+        skus.addAll(Arrays.asList(
+                "kriate.production.com.gymnegotiators.boss_inapp",
+                "kriate.production.com.gymnegotiators.buyer_inapp",
+                "kriate.production.com.gymnegotiators.seller_inapp",
+                "kriate.production.com.gymnegotiators.employer_inapp"
+        ));
+        return skus;
+    }
+
+    private void reloadInventory() {
+        final Inventory.Request request = Inventory.Request.create();
+        // load purchase info
+        request.loadAllPurchases();
+        // load SKU details
+        request.loadSkus(ProductTypes.IN_APP, getInAppSkus());
+        mCheckout.loadInventory(request, new InventoryCallback());
+    }
     private class InventoryCallback implements Inventory.Callback {
         @Override
         public void onLoaded(Inventory.Products products) {
@@ -161,7 +177,6 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
 
         }
     }
-
     private class PurchaseListener extends EmptyRequestListener<Purchase> {
         @Override
         public void onSuccess(Purchase purchase) {
@@ -175,7 +190,6 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
             reloadInventory();
         }
     }
-
     private <T> RequestListener<T> makeRequestListener() {
         return new RequestListener<T>() {
             @Override
@@ -191,7 +205,6 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
             }
         };
     }
-
     private void consume(final Purchase purchase) {
         mCheckout.whenReady(new Checkout.EmptyListener() {
             @Override
@@ -201,5 +214,6 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
         });
     }
 
+    //endregion
 }
 

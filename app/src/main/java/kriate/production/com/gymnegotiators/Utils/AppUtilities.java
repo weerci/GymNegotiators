@@ -8,6 +8,8 @@ import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.function.Function;
+
 /**
  * Created by dima on 30.06.2017.
  */
@@ -40,5 +42,4 @@ public final class AppUtilities {
         });
         snack.show();
     }
-
 }

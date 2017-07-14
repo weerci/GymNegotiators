@@ -73,4 +73,7 @@ dependencies {
     compile 'de.hdodenhof:circleimageview:2.1.0'
     //checkout
     compile 'org.solovyev.android:checkout:1.0.1'
+    //retrofit
+    compile 'com.squareup.retrofit2:retrofit:2.3.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.3.0'
 }
