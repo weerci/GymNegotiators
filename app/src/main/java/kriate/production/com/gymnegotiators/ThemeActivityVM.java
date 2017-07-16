@@ -3,6 +3,7 @@ package kriate.production.com.gymnegotiators;
 import android.content.Intent;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
+import android.media.MediaPlayer;
 import android.widget.GridView;
 import android.widget.ImageView;
 
@@ -40,7 +41,6 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
 
     public ThemeActivityVM(ThemeActivity activity, String status) {
         super(activity);
-
         App.getFitService().getAllContent().enqueue(new Callback<List<Content>>() {
             @Override
             public void onResponse(Call<List<Content>> call, Response<List<Content>> response) {
@@ -70,11 +70,22 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
                 AppUtilities.showSnackbar(activity, "Ошибка произошла", false);
             }
         });
+
+        mPlayer=MediaPlayer.create(activity, R.raw.boss);
+        mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                stopPlay();
+            }
+        });
     }
 
     @Override
     public void onDestroy() {
         mCheckout.stop();
+        if (mPlayer.isPlaying()) {
+            stopPlay();
+        }
         super.onDestroy();
     }
 
@@ -87,7 +98,7 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
     // Observable fields
     public final ObservableField<Theme> selectedTheme = new ObservableField<>();
     public final ObservableBoolean isLoading = new ObservableBoolean();
-
+    public final ObservableBoolean isPlaying = new ObservableBoolean();
 
     //Производится покупка выбранной темы**
     public void buyTheme() {
@@ -103,6 +114,32 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
             }
         }
     }
+
+    //region Player
+    MediaPlayer mPlayer;
+
+    public void stopPlay(){
+        isPlaying.set(false);
+        mPlayer.stop();
+        try {
+            mPlayer.prepare();
+            mPlayer.seekTo(0);
+        }
+        catch (Throwable t) {
+            AppUtilities.showSnackbar(activity, "Ошибка произошла", false);
+        }
+    }
+
+    public void play(){
+        isPlaying.set(true);
+        mPlayer.start();
+    }
+
+    public void pause(){
+        isPlaying.set(false);
+        mPlayer.pause();
+    }
+    //endregion
 
     //region Billing
 

@@ -133,6 +133,33 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:text="Play"
+                            android:theme="@style/AccentButton"
+                            android:visibility="@{viewModel.selectedTheme.isPurchased ? v.VISIBLE : v.GONE}"
+                            android:enabled="@{!viewModel.isPlaying}"
+                            app:onClick="@{viewModel::play}" />
+                        <Button
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Pause"
+                            android:theme="@style/AccentButton"
+                            android:enabled="@{viewModel.isPlaying}"
+                            android:visibility="@{viewModel.selectedTheme.isPurchased ? v.VISIBLE : v.GONE}"
+                            app:onClick="@{viewModel::pause}" />
+                        <Button
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Stop"
+                            android:enabled="@{viewModel.isPlaying}"
+                            android:theme="@style/AccentButton"
+                            android:visibility="@{viewModel.selectedTheme.isPurchased ? v.VISIBLE : v.GONE}"
+                            app:onClick="@{viewModel::stopPlay}" />
+                        <Button
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
                             android:text="Продать"
                             android:theme="@style/AccentButton"
                             android:visibility="@{viewModel.selectedTheme.isPurchased ? v.VISIBLE : v.GONE}"
