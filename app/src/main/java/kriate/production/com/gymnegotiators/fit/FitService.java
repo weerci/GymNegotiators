@@ -10,6 +10,6 @@ import retrofit2.http.GET;
  */
 
 public interface FitService {
-    @GET("/files/getAllContent")
+    @GET("/files/getAllContent.php")
     Call<List<Content>> getAllContent();
 }

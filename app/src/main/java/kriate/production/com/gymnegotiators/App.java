@@ -63,7 +63,7 @@ public class App extends Application {
     }
     //endregion
 
-    static final String BASE_URL = "http://www.kriate.ru/";
+    static final String BASE_URL = "http://www.kriate.ru";
     private static FitService fitService;
     private Retrofit retrofit;
 

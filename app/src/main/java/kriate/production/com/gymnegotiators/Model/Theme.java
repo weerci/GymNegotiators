@@ -1,6 +1,9 @@
 package kriate.production.com.gymnegotiators.Model;
 
 import android.databinding.ObservableBoolean;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
 
 import org.solovyev.android.checkout.Sku;
 import org.solovyev.android.checkout.Skus;
@@ -13,62 +16,50 @@ import java.util.Observable;
 
 public class Theme {
     public Theme(){}
-    public Theme(String name, String desk, int photoId, int audioId) {
-        this.name = name;
-        this.desk = desk;
-        this.photoId = photoId;
-        this.audioId = audioId;
-    }
 
-    private String name;
-    private String desk;
-    private int photoId;
-    private int audioId;
-    private Sku sku;
     private final ObservableBoolean isPurchased = new ObservableBoolean();
-
     public ObservableBoolean getIsPurchased() {
         return isPurchased;
     }
 
-    public Sku getSku() {
-        return sku;
-    }
-
-    public void setSku(Sku sku) {
-        this.sku = sku;
-    }
-
-
+    private String name;
     public String getName() {
         return name;
     }
-
     public void setName(String name) {
         this.name = name;
     }
 
+    private String desk;
     public String getDesk() {
         return desk;
     }
-
     public void setDesk(String desk) {
         this.desk = desk;
     }
 
-    public int getPhotoId() {
-        return photoId;
-    }
-
-    public void setPhotoId(int photoId) {
-        this.photoId = photoId;
-    }
-
+    private int audioId;
     public int getAudioId() {
         return audioId;
     }
-
     public void setAudioId(int audioId) {
         this.audioId = audioId;
+    }
+
+    private Sku sku;
+    public Sku getSku() {
+        return sku;
+    }
+    public void setSku(Sku sku) {
+        this.sku = sku;
+    }
+
+    private Bitmap photoBit;
+    public Bitmap getPhotoBit() {
+        return photoBit;
+    }
+    public void setPotoBit(String photoBit) {
+        byte[] data = Base64.decode(photoBit, Base64.DEFAULT);
+        this.photoBit = BitmapFactory.decodeByteArray(data, 0, data.length);
     }
 }

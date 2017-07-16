@@ -1,24 +1,14 @@
 package kriate.production.com.gymnegotiators;
 
 import android.content.Intent;
-import android.databinding.BindingAdapter;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.TextView;
 
-import com.squareup.picasso.Picasso;
 import com.stfalcon.androidmvvmhelper.mvvm.activities.ActivityViewModel;
 
 import org.solovyev.android.checkout.ActivityCheckout;
-import org.solovyev.android.checkout.Billing;
 import org.solovyev.android.checkout.BillingRequests;
 import org.solovyev.android.checkout.Checkout;
 import org.solovyev.android.checkout.EmptyRequestListener;
@@ -28,18 +18,15 @@ import org.solovyev.android.checkout.Purchase;
 import org.solovyev.android.checkout.RequestListener;
 import org.solovyev.android.checkout.Sku;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import kriate.production.com.gymnegotiators.Model.Theme;
 import kriate.production.com.gymnegotiators.Utils.AppUtilities;
-import kriate.production.com.gymnegotiators.binding.RecyclerBindingAdapter;
-import kriate.production.com.gymnegotiators.binding.RecyclerConfiguration;
+import kriate.production.com.gymnegotiators.binding.ImageAdapter;
 import kriate.production.com.gymnegotiators.fit.Content;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -54,26 +41,35 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
     public ThemeActivityVM(ThemeActivity activity, String status) {
         super(activity);
 
-        selectedTheme.set(Loader.getMapTheme().firstEntry().getValue());
-        initRecycler();
-
         App.getFitService().getAllContent().enqueue(new Callback<List<Content>>() {
             @Override
             public void onResponse(Call<List<Content>> call, Response<List<Content>> response) {
-                AppUtilities.showSnackbar(activity, "Успешно завершился запрос", false);
+
+                Loader.setMapTheme(response.body());
+
+                // Загружаются данные о покупках
+                mCheckout = Checkout.forActivity(activity, App.getContext().getBilling());
+                mCheckout.start();
+                reloadInventory();
+
+                GridView gridView = (GridView)activity.findViewById(R.id.grid_view);
+                gridView.setAdapter(new ImageAdapter(activity, Loader.getMapTheme()));
+                gridView.setOnItemClickListener((parent, v, position, id) -> {
+                    selectedTheme.set(Loader.getArrayTheme().get(position));
+                    CircleImageView civ = (CircleImageView)activity.findViewById(R.id.circleImageView);
+                    civ.setImageBitmap(selectedTheme.get().getPhotoBit());
+                });
+
+                selectedTheme.set(Loader.getMapTheme().firstEntry().getValue());
+                CircleImageView civ = (CircleImageView)activity.findViewById(R.id.circleImageView);
+                civ.setImageBitmap(selectedTheme.get().getPhotoBit());
+
             }
             @Override
             public void onFailure(Call<List<Content>> call, Throwable t) {
                 AppUtilities.showSnackbar(activity, "Ошибка произошла", false);
             }
         });
-
-/*
-        final Billing billing = App.getContext().getBilling();
-        mCheckout = Checkout.forActivity(activity, billing);
-        mCheckout.start();
-        reloadInventory();
-*/
     }
 
     @Override
@@ -88,37 +84,10 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
         mCheckout.onActivityResult(requestCode, resultCode, data);
     }
 
-    public final RecyclerConfiguration recyclerConfiguration = new RecyclerConfiguration();
-    private ArrayList<Theme> themes = new ArrayList<Theme>(Loader.getMapTheme().values());
-
     // Observable fields
     public final ObservableField<Theme> selectedTheme = new ObservableField<>();
     public final ObservableBoolean isLoading = new ObservableBoolean();
 
-    private static final int LAYOUT_HOLDER = R.layout.item_photo;
-    private static final int PHOTOS_COLUMN_COUNT = 3;
-
-    private void initRecycler() {
-        RecyclerBindingAdapter<Integer> adapter = getAdapter();
-
-        recyclerConfiguration.setLayoutManager(new GridLayoutManager(activity, PHOTOS_COLUMN_COUNT));
-        recyclerConfiguration.setItemAnimator(new DefaultItemAnimator());
-        recyclerConfiguration.setAdapter(adapter);
-    }
-
-    private RecyclerBindingAdapter<Integer> getAdapter() {
-
-        ArrayList<Integer> photos = new ArrayList<Integer>();
-        for (Theme item : themes) {
-            photos.add(item.getPhotoId());
-        }
-
-        RecyclerBindingAdapter<Integer> adapter = new RecyclerBindingAdapter<>(LAYOUT_HOLDER, BR.photoId, photos);
-
-        adapter.setOnItemClickListener((position, item)
-                -> selectedTheme.set(themes.get(position)));
-        return adapter;
-    }
 
     //Производится покупка выбранной темы**
     public void buyTheme() {
@@ -133,7 +102,6 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
                 mCheckout.startPurchaseFlow(sku, null, new PurchaseListener());
             }
         }
-
     }
 
     //region Billing
@@ -141,23 +109,13 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
     private ActivityCheckout mCheckout;
 
     Inventory.Product mProduct;
-    private static List<String> getInAppSkus() {
-        final List<String> skus = new ArrayList<>();
-        skus.addAll(Arrays.asList(
-                "kriate.production.com.gymnegotiators.boss_inapp",
-                "kriate.production.com.gymnegotiators.buyer_inapp",
-                "kriate.production.com.gymnegotiators.seller_inapp",
-                "kriate.production.com.gymnegotiators.employer_inapp"
-        ));
-        return skus;
-    }
 
     private void reloadInventory() {
         final Inventory.Request request = Inventory.Request.create();
         // load purchase info
         request.loadAllPurchases();
         // load SKU details
-        request.loadSkus(ProductTypes.IN_APP, getInAppSkus());
+        request.loadSkus(ProductTypes.IN_APP, Loader.getSkus());
         mCheckout.loadInventory(request, new InventoryCallback());
     }
     private class InventoryCallback implements Inventory.Callback {
