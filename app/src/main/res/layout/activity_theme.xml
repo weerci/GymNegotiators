@@ -186,8 +186,12 @@
                 android:numColumns="auto_fit"
                 android:stretchMode="columnWidth"
                 android:verticalSpacing="2dp" >
-
             </GridView>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{viewModel.selectedTheme.desk}"
+                />
 
         </LinearLayout>
 

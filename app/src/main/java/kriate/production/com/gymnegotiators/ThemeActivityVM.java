@@ -29,6 +29,7 @@ import kriate.production.com.gymnegotiators.Model.Theme;
 import kriate.production.com.gymnegotiators.Utils.AppUtilities;
 import kriate.production.com.gymnegotiators.binding.ImageAdapter;
 import kriate.production.com.gymnegotiators.fit.Content;
+import kriate.production.com.gymnegotiators.fit.Phrases;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -52,32 +53,51 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
                 mCheckout.start();
                 reloadInventory();
 
-                GridView gridView = (GridView)activity.findViewById(R.id.grid_view);
+                GridView gridView = (GridView) activity.findViewById(R.id.grid_view);
                 gridView.setAdapter(new ImageAdapter(activity, Loader.getMapTheme()));
                 gridView.setOnItemClickListener((parent, v, position, id) -> {
                     selectedTheme.set(Loader.getArrayTheme().get(position));
-                    CircleImageView civ = (CircleImageView)activity.findViewById(R.id.circleImageView);
+                    CircleImageView civ = (CircleImageView) activity.findViewById(R.id.circleImageView);
                     civ.setImageBitmap(selectedTheme.get().getPhotoBit());
+                    //loadPhrase();
                 });
 
                 selectedTheme.set(Loader.getMapTheme().firstEntry().getValue());
-                CircleImageView civ = (CircleImageView)activity.findViewById(R.id.circleImageView);
+                CircleImageView civ = (CircleImageView) activity.findViewById(R.id.circleImageView);
                 civ.setImageBitmap(selectedTheme.get().getPhotoBit());
 
             }
+
             @Override
             public void onFailure(Call<List<Content>> call, Throwable t) {
                 AppUtilities.showSnackbar(activity, "Ошибка произошла", false);
             }
         });
 
-        mPlayer=MediaPlayer.create(activity, R.raw.boss);
+        mPlayer = MediaPlayer.create(activity, R.raw.boss);
         mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 stopPlay();
             }
         });
+    }
+
+    private void loadPhrase() {
+        isPlaying.set(true);
+        // Загружаем фразы
+        App.getFitService().getContent(selectedTheme.get().getId()).enqueue(new Callback<List<Phrases>>() {
+            @Override
+            public void onResponse(Call<List<Phrases>> call, Response<List<Phrases>> response) {
+                Loader.setPhrases(response.body());
+            }
+
+            @Override
+            public void onFailure(Call<List<Phrases>> call, Throwable t) {
+                AppUtilities.showSnackbar(activity, "Ошибка произошла", false);
+            }
+        }
+        );
     }
 
     @Override
@@ -97,6 +117,7 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
 
     // Observable fields
     public final ObservableField<Theme> selectedTheme = new ObservableField<>();
+    public final ObservableField<String> selectedPrase = new ObservableField<>();
     public final ObservableBoolean isLoading = new ObservableBoolean();
     public final ObservableBoolean isPlaying = new ObservableBoolean();
 
@@ -118,24 +139,23 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
     //region Player
     MediaPlayer mPlayer;
 
-    public void stopPlay(){
+    public void stopPlay() {
         isPlaying.set(false);
         mPlayer.stop();
         try {
             mPlayer.prepare();
             mPlayer.seekTo(0);
-        }
-        catch (Throwable t) {
+        } catch (Throwable t) {
             AppUtilities.showSnackbar(activity, "Ошибка произошла", false);
         }
     }
 
-    public void play(){
+    public void play() {
         isPlaying.set(true);
         mPlayer.start();
     }
 
-    public void pause(){
+    public void pause() {
         isPlaying.set(false);
         mPlayer.pause();
     }
@@ -155,6 +175,7 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
         request.loadSkus(ProductTypes.IN_APP, Loader.getSkus());
         mCheckout.loadInventory(request, new InventoryCallback());
     }
+
     private class InventoryCallback implements Inventory.Callback {
         @Override
         public void onLoaded(Inventory.Products products) {
@@ -172,6 +193,7 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
 
         }
     }
+
     private class PurchaseListener extends EmptyRequestListener<Purchase> {
         @Override
         public void onSuccess(Purchase purchase) {
@@ -185,6 +207,7 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
             reloadInventory();
         }
     }
+
     private <T> RequestListener<T> makeRequestListener() {
         return new RequestListener<T>() {
             @Override
@@ -200,6 +223,7 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
             }
         };
     }
+
     private void consume(final Purchase purchase) {
         mCheckout.whenReady(new Checkout.EmptyListener() {
             @Override
