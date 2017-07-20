@@ -48,12 +48,11 @@ public final class Loader {
         return mPhrases;
    }
     public static void setPhrases(List<Phrases> phrases) {
-        ArrayList<String> t = new ArrayList<>();
-
         for (Phrases item : phrases) {
-            t.add(item.getPhrase());
+            Theme _theme = mapTheme.get(item.getTheme_id());
+            _theme.setPhrase(item.getPhrase());
+            _theme.setAudio(item.getPhrase());
         }
-        mPhrases = Arrays.toString(t.toArray());
     }
 
 

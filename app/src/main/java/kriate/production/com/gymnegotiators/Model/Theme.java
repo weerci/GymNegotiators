@@ -15,7 +15,9 @@ import java.util.Observable;
  */
 
 public class Theme {
-    public Theme(){}
+    public Theme(){
+
+    }
 
     private final ObservableBoolean isPurchased = new ObservableBoolean();
     public ObservableBoolean getIsPurchased() {
@@ -46,12 +48,20 @@ public class Theme {
         this.desk = desk;
     }
 
-    private int audioId;
-    public int getAudioId() {
-        return audioId;
+    private byte[] audio;
+    public byte[] getAudio() {
+        return audio;
     }
-    public void setAudioId(int audioId) {
-        this.audioId = audioId;
+    public void setAudio(String audio) {
+        this.audio = Base64.decode(audio, Base64.DEFAULT);;
+    }
+
+    private String phrase;
+    public String getPhrase() {
+        return phrase;
+    }
+    public void setPhrase(String phrase) {
+        this.phrase = phrase;
     }
 
     private Sku sku;

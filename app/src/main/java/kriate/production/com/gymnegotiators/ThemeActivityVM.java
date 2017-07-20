@@ -57,15 +57,16 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
                 gridView.setAdapter(new ImageAdapter(activity, Loader.getMapTheme()));
                 gridView.setOnItemClickListener((parent, v, position, id) -> {
                     selectedTheme.set(Loader.getArrayTheme().get(position));
-                    CircleImageView civ = (CircleImageView) activity.findViewById(R.id.circleImageView);
-                    civ.setImageBitmap(selectedTheme.get().getPhotoBit());
-                    //loadPhrase();
+                    if (selectedTheme.get().getIsPurchased().get() == true) {
+                        CircleImageView civ = (CircleImageView) activity.findViewById(R.id.circleImageView);
+                        civ.setImageBitmap(selectedTheme.get().getPhotoBit());
+                        loadPhrase();
+                    }
                 });
 
                 selectedTheme.set(Loader.getMapTheme().firstEntry().getValue());
                 CircleImageView civ = (CircleImageView) activity.findViewById(R.id.circleImageView);
                 civ.setImageBitmap(selectedTheme.get().getPhotoBit());
-
             }
 
             @Override
@@ -74,7 +75,7 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
             }
         });
 
-        mPlayer = MediaPlayer.create(activity, R.raw.boss);
+        mPlayer = new MediaPlayer();
         mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
@@ -140,7 +141,6 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
     MediaPlayer mPlayer;
 
     public void stopPlay() {
-        isPlaying.set(false);
         mPlayer.stop();
         try {
             mPlayer.prepare();
@@ -148,6 +148,8 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
         } catch (Throwable t) {
             AppUtilities.showSnackbar(activity, "Ошибка произошла", false);
         }
+        isPlaying.set(false);
+
     }
 
     public void play() {
@@ -190,7 +192,6 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
                     }
                 }
             }
-
         }
     }
 
