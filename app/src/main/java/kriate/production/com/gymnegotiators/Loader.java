@@ -2,6 +2,7 @@ package kriate.production.com.gymnegotiators;
 
 import android.os.Build;
 import android.support.annotation.RequiresApi;
+import android.util.Base64;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -24,16 +25,16 @@ import static android.R.attr.key;
 public final class Loader {
 
     private static TreeMap<String, Theme> mapTheme = new TreeMap<>();
-    public static TreeMap<String, Theme> getMapTheme()
-    {
+
+    public static TreeMap<String, Theme> getMapTheme() {
         return mapTheme;
     }
-    public static void setMapTheme(List<Content> contentList)
-    {
+
+    public static void setMapTheme(List<Content> contentList) {
         mapTheme.clear();
 
         for (Content item : contentList) {
-            mapTheme.put(item.getId(), new Theme(){{
+            mapTheme.put(item.getId(), new Theme() {{
                 setId(item.getId());
                 setName(item.getName());
                 setDesk(item.getDesk());
@@ -43,27 +44,22 @@ public final class Loader {
         }
     }
 
-    private static  String mPhrases;
-    public static String getPhrases() {
-        return mPhrases;
-   }
-    public static void setPhrases(List<Phrases> phrases) {
+    public static void setPhrases(Theme theme, List<Phrases> phrases) {
+        ArrayList<String> als = new ArrayList<>();
+        ArrayList<byte[]> alb = new ArrayList<>();
         for (Phrases item : phrases) {
-            Theme _theme = mapTheme.get(item.getTheme_id());
-            _theme.setPhrase(item.getPhrase());
-            _theme.setAudio(item.getPhrase());
+            als.add(item.getPhrase());
+            alb.add(Base64.decode(item.getAudio(), Base64.DEFAULT));
         }
+        theme.setPhrase(als);
+        theme.setAudio(alb);
     }
 
-
-
-
-    public static ArrayList<Theme> getArrayTheme()
-    {
+    public static ArrayList<Theme> getArrayTheme() {
         return new ArrayList<>(mapTheme.values());
     }
-    public static ArrayList<String> getSkus()
-    {
+
+    public static ArrayList<String> getSkus() {
         return new ArrayList<>(mapTheme.keySet());
     }
 }

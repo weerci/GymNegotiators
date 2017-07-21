@@ -129,24 +129,43 @@
                             android:visibility="@{viewModel.selectedTheme.isPurchased ? v.GONE : v.VISIBLE}"
                             app:onClick="@{viewModel::buyTheme}" />
 
+                        <!--Кнопка проиграть-->
                         <Button
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Play"
+                            android:text=">"
                             android:theme="@style/AccentButton"
-                            android:visibility="@{viewModel.selectedTheme.isPurchased ? v.VISIBLE : v.GONE}"
-                            android:enabled="false"
+                            android:visibility="@{viewModel.selectedTheme.isPurchased &amp;&amp; !viewModel.isPlaying || viewModel.isPaused ? v.VISIBLE : v.GONE}"
                             app:onClick="@{viewModel::play}" />
                         <Button
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Pause"
+                            android:text=">"
+                            android:theme="@style/NotActiveButton"
+                            android:visibility="@{viewModel.selectedTheme.isPurchased &amp;&amp; viewModel.isPlaying &amp;&amp; !viewModel.isPaused ? v.VISIBLE : v.GONE}"
+                            app:onClick="@{viewModel::play}" />
+
+                        <!--Кнопки паузы -->
+                        <Button
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="||"
                             android:theme="@style/AccentButton"
                             android:enabled="@{viewModel.isPlaying}"
-                            android:visibility="@{viewModel.selectedTheme.isPurchased ? v.VISIBLE : v.GONE}"
+                            android:visibility="@{viewModel.selectedTheme.isPurchased &amp;&amp; viewModel.isPlaying &amp;&amp; !viewModel.isPaused ? v.VISIBLE : v.GONE}"
                             app:onClick="@{viewModel::pause}" />
+                        <Button
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="||"
+                            android:theme="@style/NotActiveButton"
+                            android:visibility="@{viewModel.selectedTheme.isPurchased &amp;&amp; !viewModel.isPlaying || viewModel.isPaused ? v.VISIBLE : v.GONE}"/>
+
+                        <!--Кнопка остановки-->
                         <Button
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -154,16 +173,25 @@
                             android:text="Stop"
                             android:enabled="@{viewModel.isPlaying}"
                             android:theme="@style/AccentButton"
-                            android:visibility="@{viewModel.selectedTheme.isPurchased ? v.VISIBLE : v.GONE}"
+                            android:visibility="@{viewModel.selectedTheme.isPurchased &amp;&amp; viewModel.isPlaying ? v.VISIBLE : v.GONE}"
                             app:onClick="@{viewModel::stopPlay}" />
                         <Button
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Stop"
+                            android:theme="@style/NotActiveButton"
+                            android:visibility="@{viewModel.selectedTheme.isPurchased &amp;&amp; !viewModel.isPlaying ? v.VISIBLE : v.GONE}"
+                            app:onClick="@{viewModel::stopPlay}" />
+
+                        <!--Button
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="Продать"
                             android:theme="@style/AccentButton"
                             android:visibility="@{viewModel.selectedTheme.isPurchased ? v.VISIBLE : v.GONE}"
-                            app:onClick="@{viewModel::buyTheme}" />
+                            app:onClick="@{viewModel::buyTheme}" /-->
                     </LinearLayout>
 
                     <ProgressBar
@@ -185,8 +213,21 @@
                 android:horizontalSpacing="2dp"
                 android:numColumns="auto_fit"
                 android:stretchMode="columnWidth"
+                android:visibility="@{!viewModel.isPlaying ? v.VISIBLE : v.GONE}"
                 android:verticalSpacing="2dp" >
             </GridView>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:visibility="@{viewModel.isPlaying || viewModel.isPaused ? v.VISIBLE : v.GONE}">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@{viewModel.phrase}"
+                    />
+            </LinearLayout>
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

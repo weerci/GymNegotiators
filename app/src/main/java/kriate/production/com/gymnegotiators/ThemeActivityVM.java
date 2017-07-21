@@ -1,9 +1,12 @@
 package kriate.production.com.gymnegotiators;
 
 import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
+import android.databinding.ObservableShort;
 import android.media.MediaPlayer;
+import android.os.Environment;
 import android.widget.GridView;
 import android.widget.ImageView;
 
@@ -19,6 +22,11 @@ import org.solovyev.android.checkout.Purchase;
 import org.solovyev.android.checkout.RequestListener;
 import org.solovyev.android.checkout.Sku;
 
+import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +50,8 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
 
     public ThemeActivityVM(ThemeActivity activity, String status) {
         super(activity);
+
+        // Загружаются темы
         App.getFitService().getAllContent().enqueue(new Callback<List<Content>>() {
             @Override
             public void onResponse(Call<List<Content>> call, Response<List<Content>> response) {
@@ -53,52 +63,32 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
                 mCheckout.start();
                 reloadInventory();
 
+                // Заполняется сетка
                 GridView gridView = (GridView) activity.findViewById(R.id.grid_view);
                 gridView.setAdapter(new ImageAdapter(activity, Loader.getMapTheme()));
+
+                // Преключается текущая тема
                 gridView.setOnItemClickListener((parent, v, position, id) -> {
                     selectedTheme.set(Loader.getArrayTheme().get(position));
                     if (selectedTheme.get().getIsPurchased().get() == true) {
                         CircleImageView civ = (CircleImageView) activity.findViewById(R.id.circleImageView);
                         civ.setImageBitmap(selectedTheme.get().getPhotoBit());
-                        loadPhrase();
+                        //loadPhrase();
                     }
                 });
 
+                // Устанавливается текущая тема
                 selectedTheme.set(Loader.getMapTheme().firstEntry().getValue());
+                //loadPhrase();
                 CircleImageView civ = (CircleImageView) activity.findViewById(R.id.circleImageView);
                 civ.setImageBitmap(selectedTheme.get().getPhotoBit());
             }
 
             @Override
             public void onFailure(Call<List<Content>> call, Throwable t) {
-                AppUtilities.showSnackbar(activity, "Ошибка произошла", false);
+                AppUtilities.showSnackbar(activity, "Ошибка загрузки темы", false);
             }
         });
-
-        mPlayer = new MediaPlayer();
-        mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                stopPlay();
-            }
-        });
-    }
-
-    private void loadPhrase() {
-        isPlaying.set(true);
-        // Загружаем фразы
-        App.getFitService().getContent(selectedTheme.get().getId()).enqueue(new Callback<List<Phrases>>() {
-            @Override
-            public void onResponse(Call<List<Phrases>> call, Response<List<Phrases>> response) {
-                Loader.setPhrases(response.body());
-            }
-
-            @Override
-            public void onFailure(Call<List<Phrases>> call, Throwable t) {
-                AppUtilities.showSnackbar(activity, "Ошибка произошла", false);
-            }
-        }
-        );
     }
 
     @Override
@@ -107,7 +97,64 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
         if (mPlayer.isPlaying()) {
             stopPlay();
         }
+        mPlayer.release();
         super.onDestroy();
+    }
+
+    private void loadPhrase() {
+        isLoading.set(true);
+        Theme currentTheme = Loader.getMapTheme().get(selectedTheme.get().getId());
+        if (currentTheme.getPhrase() == null) {
+            App.getFitService().getContent(selectedTheme.get().getId()).enqueue(new Callback<List<Phrases>>() {
+                @Override
+                public void onResponse(Call<List<Phrases>> call, Response<List<Phrases>> response) {
+                    isLoading.set(false);
+                    Loader.setPhrases(currentTheme, response.body());
+                    viewAndPlayPhrase();
+                }
+
+                @Override
+                public void onFailure(Call<List<Phrases>> call, Throwable t) {
+                    isLoading.set(false);
+                    AppUtilities.showSnackbar(activity, "Ошибка загрузки фраз", false);
+                }
+            });
+        } else {
+            viewAndPlayPhrase();
+            isLoading.set(false);
+        }
+    }
+
+    private void viewAndPlayPhrase() {
+        isPaused.set(false);
+        isPlaying.set(true);
+        try {
+            Theme currentTheme = Loader.getMapTheme().get(selectedTheme.get().getId());
+            phrase.set(currentTheme.getPraseToString());
+            playPhrase(0);
+        } catch (Exception e) {
+            isPlaying.set(false);
+        }
+    }
+
+    private void playPhrase(int index) {
+        try {
+            File tempMp3 = File.createTempFile("phrase", ".mp3", App.getContext().getCacheDir());
+            tempMp3.deleteOnExit();
+            FileOutputStream fos = new FileOutputStream(tempMp3);
+            fos.write(selectedTheme.get().getAudio().get(index));
+            fos.close();
+
+            mPlayer.reset();
+
+            FileInputStream fis = new FileInputStream(tempMp3);
+            mPlayer.setDataSource(fis.getFD());
+
+            mPlayer.prepare();
+            mPlayer.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -118,11 +165,12 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
 
     // Observable fields
     public final ObservableField<Theme> selectedTheme = new ObservableField<>();
-    public final ObservableField<String> selectedPrase = new ObservableField<>();
     public final ObservableBoolean isLoading = new ObservableBoolean();
     public final ObservableBoolean isPlaying = new ObservableBoolean();
+    public final ObservableBoolean isPaused = new ObservableBoolean();
+    public final ObservableField<String> phrase = new ObservableField<>();
 
-    //Производится покупка выбранной темы**
+    //Производится покупка выбранной темы
     public void buyTheme() {
         Sku sku = selectedTheme.get().getSku();
         if (sku != null) {
@@ -131,7 +179,6 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
                 isLoading.set(true);
                 consume(purchase);
             } else {
-
                 mCheckout.startPurchaseFlow(sku, null, new PurchaseListener());
             }
         }
@@ -140,27 +187,32 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
     //region Player
     MediaPlayer mPlayer;
 
-    public void stopPlay() {
-        mPlayer.stop();
-        try {
-            mPlayer.prepare();
-            mPlayer.seekTo(0);
-        } catch (Throwable t) {
-            AppUtilities.showSnackbar(activity, "Ошибка произошла", false);
-        }
-        isPlaying.set(false);
-
-    }
-
+    private int currentTrack;
     public void play() {
-        isPlaying.set(true);
-        mPlayer.start();
+        currentTrack = 0;
+        mPlayer = new MediaPlayer();
+        mPlayer.setOnCompletionListener(mp -> {
+            if (currentTrack < selectedTheme.get().getAudio().size() - 1) {
+                playPhrase(++currentTrack);
+            } else {
+                stopPlay();
+                mPlayer.release();
+            }
+        });
+        loadPhrase();
     }
 
     public void pause() {
-        isPlaying.set(false);
         mPlayer.pause();
+        isPaused.set(true);
     }
+
+    public void stopPlay() {
+        isPlaying.set(false);
+        isPaused.set(false);
+        mPlayer.stop();
+    }
+
     //endregion
 
     //region Billing

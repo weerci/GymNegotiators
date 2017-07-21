@@ -8,6 +8,7 @@ import android.util.Base64;
 import org.solovyev.android.checkout.Sku;
 import org.solovyev.android.checkout.Skus;
 
+import java.util.ArrayList;
 import java.util.Observable;
 
 /**
@@ -15,53 +16,76 @@ import java.util.Observable;
  */
 
 public class Theme {
-    public Theme(){
+    public Theme() {
 
     }
 
     private final ObservableBoolean isPurchased = new ObservableBoolean();
+
     public ObservableBoolean getIsPurchased() {
         return isPurchased;
     }
 
     private String id;
+
     public String getId() {
         return id;
     }
+
     public void setId(String id) {
         this.id = id;
     }
 
     private String name;
+
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
 
     private String desk;
+
     public String getDesk() {
         return desk;
     }
+
     public void setDesk(String desk) {
         this.desk = desk;
     }
 
-    private byte[] audio;
-    public byte[] getAudio() {
+    private ArrayList<byte[]> audio;
+
+    public ArrayList<byte[]> getAudio() {
         return audio;
     }
-    public void setAudio(String audio) {
-        this.audio = Base64.decode(audio, Base64.DEFAULT);;
+
+    public void setAudio(ArrayList<byte[]> audio) {
+        this.audio = audio;
     }
 
-    private String phrase;
-    public String getPhrase() {
+    private ArrayList<String> phrase;
+
+    public ArrayList<String> getPhrase() {
         return phrase;
     }
-    public void setPhrase(String phrase) {
+
+    public void setPhrase(ArrayList<String> phrase) {
         this.phrase = phrase;
+    }
+
+
+    private String praseToString;
+    public String getPraseToString() {
+        StringBuilder builder = new StringBuilder();
+        if (phrase != null) {
+            for (String s : phrase) {
+                builder.append(s+"\n");
+            }
+        }
+        return builder.toString();
     }
 
     private Sku sku;
