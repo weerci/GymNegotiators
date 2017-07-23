@@ -26,6 +26,7 @@ public class Theme {
         return isPurchased;
     }
 
+
     private String id;
 
     public String getId() {
@@ -36,6 +37,7 @@ public class Theme {
         this.id = id;
     }
 
+
     private String name;
 
     public String getName() {
@@ -45,6 +47,7 @@ public class Theme {
     public void setName(String name) {
         this.name = name;
     }
+
 
     private String desk;
 
@@ -78,28 +81,33 @@ public class Theme {
 
 
     private String praseToString;
+
     public String getPraseToString() {
         StringBuilder builder = new StringBuilder();
         if (phrase != null) {
             for (String s : phrase) {
-                builder.append(s+"\n");
+                builder.append(s + "\n");
             }
         }
         return builder.toString();
     }
 
     private Sku sku;
+
     public Sku getSku() {
         return sku;
     }
+
     public void setSku(Sku sku) {
         this.sku = sku;
     }
 
     private Bitmap photoBit;
+
     public Bitmap getPhotoBit() {
         return photoBit;
     }
+
     public void setPotoBit(String photoBit) {
         byte[] data = Base64.decode(photoBit, Base64.DEFAULT);
         this.photoBit = BitmapFactory.decodeByteArray(data, 0, data.length);

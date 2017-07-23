@@ -48,6 +48,14 @@ import retrofit2.Response;
 
 public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
 
+    //region Observable fields
+    public final ObservableField<Theme> selectedTheme = new ObservableField<>();
+    public final ObservableBoolean isLoading = new ObservableBoolean();
+    public final ObservableBoolean isPlaying = new ObservableBoolean();
+    public final ObservableBoolean isPaused = new ObservableBoolean();
+    public final ObservableField<String> phrase = new ObservableField<>();
+    //endregion
+
     public ThemeActivityVM(ThemeActivity activity, String status) {
         super(activity);
 
@@ -67,19 +75,14 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
                 GridView gridView = (GridView) activity.findViewById(R.id.grid_view);
                 gridView.setAdapter(new ImageAdapter(activity, Loader.getMapTheme()));
 
-                // Преключается текущая тема
+                // Пeреключается текущая тема
                 gridView.setOnItemClickListener((parent, v, position, id) -> {
                     selectedTheme.set(Loader.getArrayTheme().get(position));
-                    if (selectedTheme.get().getIsPurchased().get() == true) {
-                        CircleImageView civ = (CircleImageView) activity.findViewById(R.id.circleImageView);
-                        civ.setImageBitmap(selectedTheme.get().getPhotoBit());
-                        //loadPhrase();
-                    }
+                    CircleImageView civ = (CircleImageView) activity.findViewById(R.id.circleImageView);
+                    civ.setImageBitmap(selectedTheme.get().getPhotoBit());
                 });
 
-                // Устанавливается текущая тема
                 selectedTheme.set(Loader.getMapTheme().firstEntry().getValue());
-                //loadPhrase();
                 CircleImageView civ = (CircleImageView) activity.findViewById(R.id.circleImageView);
                 civ.setImageBitmap(selectedTheme.get().getPhotoBit());
             }
@@ -162,13 +165,6 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
         super.onActivityResult(requestCode, resultCode, data);
         mCheckout.onActivityResult(requestCode, resultCode, data);
     }
-
-    // Observable fields
-    public final ObservableField<Theme> selectedTheme = new ObservableField<>();
-    public final ObservableBoolean isLoading = new ObservableBoolean();
-    public final ObservableBoolean isPlaying = new ObservableBoolean();
-    public final ObservableBoolean isPaused = new ObservableBoolean();
-    public final ObservableField<String> phrase = new ObservableField<>();
 
     //Производится покупка выбранной темы
     public void buyTheme() {
