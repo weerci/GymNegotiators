@@ -29,8 +29,7 @@ public class RecyclerBindingAdapter<T>
 
     @Override
     public RecyclerBindingAdapter.BindingHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext())
-                .inflate(holderLayout, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(holderLayout, parent, false);
         return new BindingHolder(v);
     }
 

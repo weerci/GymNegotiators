@@ -7,6 +7,9 @@ import android.databinding.ObservableField;
 import android.databinding.ObservableShort;
 import android.media.MediaPlayer;
 import android.os.Environment;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.widget.GridView;
 import android.widget.ImageView;
 
@@ -36,6 +39,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import kriate.production.com.gymnegotiators.Model.Theme;
 import kriate.production.com.gymnegotiators.Utils.AppUtilities;
 import kriate.production.com.gymnegotiators.binding.ImageAdapter;
+import kriate.production.com.gymnegotiators.binding.RecyclerThemeAdapter;
 import kriate.production.com.gymnegotiators.fit.Content;
 import kriate.production.com.gymnegotiators.fit.Phrases;
 import retrofit2.Call;
@@ -56,6 +60,10 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
     public final ObservableField<String> phrase = new ObservableField<>();
     //endregion
 
+    private RecyclerView mRecyclerView;
+    private RecyclerThemeAdapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+
     public ThemeActivityVM(ThemeActivity activity, String status) {
         super(activity);
 
@@ -71,6 +79,26 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
                 mCheckout.start();
                 reloadInventory();
 
+                mRecyclerView = (RecyclerView) activity.findViewById(R.id.rv);
+
+                // если мы уверены, что изменения в контенте не изменят размер layout-а RecyclerView
+                // передаем параметр true - это увеличивает производительность
+                mRecyclerView.setHasFixedSize(true);
+
+                // используем linear layout manager
+                mLayoutManager = new GridLayoutManager(activity, 3);
+                mRecyclerView.setLayoutManager(mLayoutManager);
+                mRecyclerView.setClickable(true);
+                // создаем адаптер
+                mAdapter = new RecyclerThemeAdapter(Loader.getArrayTheme());
+                mAdapter.setOnItemClickListener((position, item) -> {
+                    selectedTheme.set(Loader.getArrayTheme().get(position));
+                    CircleImageView civ = (CircleImageView) activity.findViewById(R.id.circleImageView);
+                    civ.setImageBitmap(selectedTheme.get().getPhotoBit());
+                });
+                mRecyclerView.setAdapter(mAdapter);
+
+/*
                 // Заполняется сетка
                 GridView gridView = (GridView) activity.findViewById(R.id.grid_view);
                 gridView.setAdapter(new ImageAdapter(activity, Loader.getMapTheme()));
@@ -81,6 +109,7 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
                     CircleImageView civ = (CircleImageView) activity.findViewById(R.id.circleImageView);
                     civ.setImageBitmap(selectedTheme.get().getPhotoBit());
                 });
+*/
 
                 selectedTheme.set(Loader.getMapTheme().firstEntry().getValue());
                 CircleImageView civ = (CircleImageView) activity.findViewById(R.id.circleImageView);

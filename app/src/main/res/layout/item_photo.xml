@@ -1,15 +1,6 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <data>
-        <variable
-            name="name"
-            type="java.lang.String"/>
-        <variable
-            name="photoId"
-            type="java.lang.Integer"/>
-    </data>
-
     <kriate.production.com.gymnegotiators.ui.SquareRelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -23,10 +14,14 @@
             android:padding="1dp"
             >
             <ImageView
+                android:id="@+id/photoImage"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                app:imageResource="@{photoId}"/>
+                android:scaleType="centerCrop"/>
+            <TextView
+                android:id="@+id/photoText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
         </LinearLayout>
     </kriate.production.com.gymnegotiators.ui.SquareRelativeLayout>
 
