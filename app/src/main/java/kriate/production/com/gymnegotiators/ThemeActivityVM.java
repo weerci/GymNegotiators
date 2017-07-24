@@ -60,77 +60,31 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
     public final ObservableField<String> phrase = new ObservableField<>();
     //endregion
 
+    //region Fields and Methods
+
     private RecyclerView mRecyclerView;
     private RecyclerThemeAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
-    public ThemeActivityVM(ThemeActivity activity, String status) {
-        super(activity);
+    private void reloadRecyclerView() {
+        mRecyclerView = (RecyclerView) activity.findViewById(R.id.rv);
 
-        // Загружаются темы
-        App.getFitService().getAllContent().enqueue(new Callback<List<Content>>() {
-            @Override
-            public void onResponse(Call<List<Content>> call, Response<List<Content>> response) {
+        // если мы уверены, что изменения в контенте не изменят размер layout-а RecyclerView
+        // передаем параметр true - это увеличивает производительность
+        mRecyclerView.setHasFixedSize(true);
 
-                Loader.setMapTheme(response.body());
-
-                // Загружаются данные о покупках
-                mCheckout = Checkout.forActivity(activity, App.getContext().getBilling());
-                mCheckout.start();
-                reloadInventory();
-
-                mRecyclerView = (RecyclerView) activity.findViewById(R.id.rv);
-
-                // если мы уверены, что изменения в контенте не изменят размер layout-а RecyclerView
-                // передаем параметр true - это увеличивает производительность
-                mRecyclerView.setHasFixedSize(true);
-
-                // используем linear layout manager
-                mLayoutManager = new GridLayoutManager(activity, 3);
-                mRecyclerView.setLayoutManager(mLayoutManager);
-                mRecyclerView.setClickable(true);
-                // создаем адаптер
-                mAdapter = new RecyclerThemeAdapter(Loader.getArrayTheme());
-                mAdapter.setOnItemClickListener((position, item) -> {
-                    selectedTheme.set(Loader.getArrayTheme().get(position));
-                    CircleImageView civ = (CircleImageView) activity.findViewById(R.id.circleImageView);
-                    civ.setImageBitmap(selectedTheme.get().getPhotoBit());
-                });
-                mRecyclerView.setAdapter(mAdapter);
-
-/*
-                // Заполняется сетка
-                GridView gridView = (GridView) activity.findViewById(R.id.grid_view);
-                gridView.setAdapter(new ImageAdapter(activity, Loader.getMapTheme()));
-
-                // Пeреключается текущая тема
-                gridView.setOnItemClickListener((parent, v, position, id) -> {
-                    selectedTheme.set(Loader.getArrayTheme().get(position));
-                    CircleImageView civ = (CircleImageView) activity.findViewById(R.id.circleImageView);
-                    civ.setImageBitmap(selectedTheme.get().getPhotoBit());
-                });
-*/
-
-                selectedTheme.set(Loader.getMapTheme().firstEntry().getValue());
-                CircleImageView civ = (CircleImageView) activity.findViewById(R.id.circleImageView);
-                civ.setImageBitmap(selectedTheme.get().getPhotoBit());
-            }
-
-            @Override
-            public void onFailure(Call<List<Content>> call, Throwable t) {
-                AppUtilities.showSnackbar(activity, "Ошибка загрузки темы", false);
-            }
+        // используем linear layout manager
+        mLayoutManager = new GridLayoutManager(activity, 3);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setClickable(true);
+        // создаем адаптер
+        mAdapter = new RecyclerThemeAdapter(Loader.getArrayTheme());
+        mAdapter.setOnItemClickListener((position, item) -> {
+            selectedTheme.set(Loader.getArrayTheme().get(position));
+            CircleImageView civ = (CircleImageView) activity.findViewById(R.id.circleImageView);
+            civ.setImageBitmap(selectedTheme.get().getPhotoBit());
         });
-    }
-
-    @Override
-    public void onDestroy() {
-        mCheckout.stop();
-        if (mPlayer.isPlaying()) {
-            stopPlay();
-        }
-        mPlayer.release();
-        super.onDestroy();
+        mRecyclerView.setAdapter(mAdapter);
     }
 
     private void loadPhrase() {
@@ -190,6 +144,60 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
         }
     }
 
+    //endregion
+
+    public ThemeActivityVM(ThemeActivity activity, String status) {
+        super(activity);
+
+        // Загружаются темы
+        App.getFitService().getAllContent().enqueue(new Callback<List<Content>>() {
+            @Override
+            public void onResponse(Call<List<Content>> call, Response<List<Content>> response) {
+
+                Loader.setMapTheme(response.body());
+
+                // Загружаются данные о покупках
+                mCheckout = Checkout.forActivity(activity, App.getContext().getBilling());
+                mCheckout.start();
+                reloadInventory();
+
+                reloadRecyclerView();
+
+/*
+                // Заполняется сетка
+                GridView gridView = (GridView) activity.findViewById(R.id.grid_view);
+                gridView.setAdapter(new ImageAdapter(activity, Loader.getMapTheme()));
+
+                // Пeреключается текущая тема
+                gridView.setOnItemClickListener((parent, v, position, id) -> {
+                    selectedTheme.set(Loader.getArrayTheme().get(position));
+                    CircleImageView civ = (CircleImageView) activity.findViewById(R.id.circleImageView);
+                    civ.setImageBitmap(selectedTheme.get().getPhotoBit());
+                });
+*/
+
+                selectedTheme.set(Loader.getMapTheme().firstEntry().getValue());
+                CircleImageView civ = (CircleImageView) activity.findViewById(R.id.circleImageView);
+                civ.setImageBitmap(selectedTheme.get().getPhotoBit());
+            }
+
+            @Override
+            public void onFailure(Call<List<Content>> call, Throwable t) {
+                AppUtilities.showSnackbar(activity, "Ошибка загрузки темы", false);
+            }
+        });
+    }
+
+    @Override
+    public void onDestroy() {
+        mCheckout.stop();
+        if (mPlayer.isPlaying()) {
+            stopPlay();
+        }
+        mPlayer.release();
+        super.onDestroy();
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -214,20 +222,22 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
     MediaPlayer mPlayer;
 
     private int currentTrack;
+
     public void play() {
         currentTrack = 0;
         mPlayer = new MediaPlayer();
         mPlayer.setOnCompletionListener(mp -> {
-            int i = ++currentTrack;
-            if (currentTrack < selectedTheme.get().getAudio().size() - 1) {
-                phrase.set(selectedTheme.get().getPhrase().get(i));
-                playPhrase(i);
+            if (currentTrack < selectedTheme.get().getAudio().size()) {
+                phrase.set(selectedTheme.get().getPhrase().get(currentTrack));
+                playPhrase(currentTrack);
             } else {
                 stopPlay();
                 mPlayer.release();
             }
+            currentTrack++;
         });
         loadPhrase();
+        currentTrack++;
     }
 
     public void pause() {
