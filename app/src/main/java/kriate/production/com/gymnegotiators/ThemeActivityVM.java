@@ -70,11 +70,8 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
                 // Преключается текущая тема
                 gridView.setOnItemClickListener((parent, v, position, id) -> {
                     selectedTheme.set(Loader.getArrayTheme().get(position));
-                    if (selectedTheme.get().getIsPurchased().get() == true) {
-                        CircleImageView civ = (CircleImageView) activity.findViewById(R.id.circleImageView);
-                        civ.setImageBitmap(selectedTheme.get().getPhotoBit());
-                        //loadPhrase();
-                    }
+                    CircleImageView civ = (CircleImageView) activity.findViewById(R.id.circleImageView);
+                    civ.setImageBitmap(selectedTheme.get().getPhotoBit());
                 });
 
                 // Устанавливается текущая тема
@@ -130,7 +127,8 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
         isPlaying.set(true);
         try {
             Theme currentTheme = Loader.getMapTheme().get(selectedTheme.get().getId());
-            phrase.set(currentTheme.getPraseToString());
+            //phrase.set(currentTheme.getPraseToString());
+            phrase.set(currentTheme.getPhrase().get(0));
             playPhrase(0);
         } catch (Exception e) {
             isPlaying.set(false);
@@ -192,8 +190,10 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
         currentTrack = 0;
         mPlayer = new MediaPlayer();
         mPlayer.setOnCompletionListener(mp -> {
+            int i = ++currentTrack;
             if (currentTrack < selectedTheme.get().getAudio().size() - 1) {
-                playPhrase(++currentTrack);
+                phrase.set(selectedTheme.get().getPhrase().get(i));
+                playPhrase(i);
             } else {
                 stopPlay();
                 mPlayer.release();
