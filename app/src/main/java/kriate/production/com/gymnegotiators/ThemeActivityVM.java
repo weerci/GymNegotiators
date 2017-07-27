@@ -36,6 +36,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import kriate.production.com.gymnegotiators.Model.Media;
 import kriate.production.com.gymnegotiators.Model.Theme;
 import kriate.production.com.gymnegotiators.Utils.AppUtilities;
 import kriate.production.com.gymnegotiators.binding.ImageAdapter;
@@ -54,6 +55,7 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
 
     //region Observable fields
     public final ObservableField<Theme> selectedTheme = new ObservableField<>();
+    public final ObservableField<Media> media = new ObservableField<>();
     public final ObservableBoolean isLoading = new ObservableBoolean();
     public final ObservableBoolean isPlaying = new ObservableBoolean();
     public final ObservableBoolean isPaused = new ObservableBoolean();
@@ -96,7 +98,8 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
                 public void onResponse(Call<List<Phrases>> call, Response<List<Phrases>> response) {
                     isLoading.set(false);
                     Loader.setPhrases(currentTheme, response.body());
-                    viewAndPlayPhrase();
+                    //viewAndPlayPhrase();
+                    Media.item().play(selectedTheme.get().getPhrases());
                 }
 
                 @Override
@@ -106,7 +109,8 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
                 }
             });
         } else {
-            viewAndPlayPhrase();
+            Media.item().play(selectedTheme.get().getPhrases());
+            //viewAndPlayPhrase();
             isLoading.set(false);
         }
     }
@@ -148,6 +152,8 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
 
     public ThemeActivityVM(ThemeActivity activity, String status) {
         super(activity);
+
+        media.set(Media.item());
 
         // Загружаются темы
         App.getFitService().getAllContent().enqueue(new Callback<List<Content>>() {
@@ -224,7 +230,8 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
     private int currentTrack;
 
     public void play() {
-        currentTrack = 0;
+        loadPhrase();
+       /* currentTrack = 0;
         mPlayer = new MediaPlayer();
         mPlayer.setOnCompletionListener(mp -> {
             if (currentTrack < selectedTheme.get().getAudio().size()) {
@@ -237,18 +244,20 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
             currentTrack++;
         });
         loadPhrase();
-        currentTrack++;
+        currentTrack++;*/
     }
 
     public void pause() {
-        mPlayer.pause();
-        isPaused.set(true);
+        Media.item().pause();
+       /* mPlayer.pause();
+        isPaused.set(true);*/
     }
 
     public void stopPlay() {
-        isPlaying.set(false);
+        Media.item().stop();
+        /*isPlaying.set(false);
         isPaused.set(false);
-        mPlayer.stop();
+        mPlayer.stop();*/
     }
 
     //endregion

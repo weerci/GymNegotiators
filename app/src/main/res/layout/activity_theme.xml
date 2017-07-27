@@ -135,7 +135,7 @@
                             android:layout_weight="1"
                             android:text=">"
                             android:theme="@style/AccentButton"
-                            android:visibility="@{viewModel.selectedTheme.isPurchased &amp;&amp; !viewModel.isPlaying || viewModel.isPaused ? v.VISIBLE : v.GONE}"
+                            android:visibility="@{viewModel.selectedTheme.isPurchased &amp;&amp; viewModel.media.canPlay ? v.VISIBLE : v.GONE}"
                             app:onClick="@{viewModel::play}" />
                         <Button
                             android:layout_width="0dp"
@@ -143,7 +143,7 @@
                             android:layout_weight="1"
                             android:text=">"
                             android:theme="@style/NotActiveButton"
-                            android:visibility="@{viewModel.selectedTheme.isPurchased &amp;&amp; viewModel.isPlaying &amp;&amp; !viewModel.isPaused ? v.VISIBLE : v.GONE}"
+                            android:visibility="@{viewModel.selectedTheme.isPurchased &amp;&amp; !viewModel.media.canPlay ? v.VISIBLE : v.GONE}"
                             app:onClick="@{viewModel::play}" />
 
                         <!--Кнопки паузы -->
@@ -154,7 +154,7 @@
                             android:text="||"
                             android:theme="@style/AccentButton"
                             android:enabled="@{viewModel.isPlaying}"
-                            android:visibility="@{viewModel.selectedTheme.isPurchased &amp;&amp; viewModel.isPlaying &amp;&amp; !viewModel.isPaused ? v.VISIBLE : v.GONE}"
+                            android:visibility="@{viewModel.selectedTheme.isPurchased &amp;&amp; viewModel.media.canPause ? v.VISIBLE : v.GONE}"
                             app:onClick="@{viewModel::pause}" />
                         <Button
                             android:layout_width="0dp"
@@ -162,7 +162,7 @@
                             android:layout_weight="1"
                             android:text="||"
                             android:theme="@style/NotActiveButton"
-                            android:visibility="@{viewModel.selectedTheme.isPurchased &amp;&amp; !viewModel.isPlaying || viewModel.isPaused ? v.VISIBLE : v.GONE}"/>
+                            android:visibility="@{viewModel.selectedTheme.isPurchased &amp;&amp; !viewModel.media.canPause ? v.VISIBLE : v.GONE}"/>
 
                         <!--Кнопка остановки-->
                         <Button
@@ -172,7 +172,7 @@
                             android:text="Stop"
                             android:enabled="@{viewModel.isPlaying}"
                             android:theme="@style/AccentButton"
-                            android:visibility="@{viewModel.selectedTheme.isPurchased &amp;&amp; viewModel.isPlaying ? v.VISIBLE : v.GONE}"
+                            android:visibility="@{viewModel.selectedTheme.isPurchased &amp;&amp; viewModel.media.canStop ? v.VISIBLE : v.GONE}"
                             app:onClick="@{viewModel::stopPlay}" />
                         <Button
                             android:layout_width="0dp"
@@ -180,7 +180,7 @@
                             android:layout_weight="1"
                             android:text="Stop"
                             android:theme="@style/NotActiveButton"
-                            android:visibility="@{viewModel.selectedTheme.isPurchased &amp;&amp; !viewModel.isPlaying ? v.VISIBLE : v.GONE}"
+                            android:visibility="@{viewModel.selectedTheme.isPurchased &amp;&amp; !viewModel.media.canStop ? v.VISIBLE : v.GONE}"
                             app:onClick="@{viewModel::stopPlay}" />
 
                         <!--Button
@@ -206,7 +206,7 @@
             <android.support.v7.widget.RecyclerView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:visibility="@{!viewModel.isPlaying ? v.VISIBLE : v.GONE}"
+                android:visibility="@{!viewModel.media.canStop ? v.VISIBLE : v.GONE}"
                 android:id="@+id/rv"
                 />
 
@@ -214,7 +214,7 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:visibility="@{viewModel.isPlaying || viewModel.isPaused ? v.VISIBLE : v.GONE}">
+                android:visibility="@{viewModel.media.canStop ? v.VISIBLE : v.GONE}">
                 <ScrollView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
@@ -222,7 +222,7 @@
                         style="@style/PhraseTextView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@{viewModel.phrase}"
+                        android:text="@{viewModel.media.currentPhrase}"
                         />
                 </ScrollView>
             </LinearLayout>

@@ -9,7 +9,10 @@ import org.solovyev.android.checkout.Sku;
 import org.solovyev.android.checkout.Skus;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
+
+import kriate.production.com.gymnegotiators.fit.Phrases;
 
 /**
  * Created by dima on 29.06.2017.
@@ -28,57 +31,52 @@ public class Theme {
 
 
     private String id;
-
     public String getId() {
         return id;
     }
-
     public void setId(String id) {
         this.id = id;
     }
 
-
     private String name;
-
     public String getName() {
         return name;
     }
-
     public void setName(String name) {
         this.name = name;
     }
 
-
     private String desk;
-
     public String getDesk() {
         return desk;
     }
-
     public void setDesk(String desk) {
         this.desk = desk;
     }
 
     private ArrayList<byte[]> audio;
-
     public ArrayList<byte[]> getAudio() {
         return audio;
     }
-
     public void setAudio(ArrayList<byte[]> audio) {
         this.audio = audio;
     }
 
     private ArrayList<String> phrase;
-
     public ArrayList<String> getPhrase() {
         return phrase;
     }
-
     public void setPhrase(ArrayList<String> phrase) {
         this.phrase = phrase;
     }
 
+    private List<Phrases> phrases;
+    public List<Phrases> getPhrases() {
+        return phrases;
+    }
+    public void setPhrases(List<Phrases> phrases) {
+        this.phrases = phrases;
+    }
 
     private String praseToString;
 

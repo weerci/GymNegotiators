@@ -53,6 +53,8 @@ public final class Loader {
         }
         theme.setPhrase(als);
         theme.setAudio(alb);
+
+        theme.setPhrases(phrases);
     }
 
     public static ArrayList<Theme> getArrayTheme() {
