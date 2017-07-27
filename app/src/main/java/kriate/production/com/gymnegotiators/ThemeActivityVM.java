@@ -98,7 +98,6 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
                 public void onResponse(Call<List<Phrases>> call, Response<List<Phrases>> response) {
                     isLoading.set(false);
                     Loader.setPhrases(currentTheme, response.body());
-                    //viewAndPlayPhrase();
                     Media.item().play(selectedTheme.get().getPhrases());
                 }
 
@@ -110,41 +109,7 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
             });
         } else {
             Media.item().play(selectedTheme.get().getPhrases());
-            //viewAndPlayPhrase();
             isLoading.set(false);
-        }
-    }
-
-    private void viewAndPlayPhrase() {
-        isPaused.set(false);
-        isPlaying.set(true);
-        try {
-            Theme currentTheme = Loader.getMapTheme().get(selectedTheme.get().getId());
-            //phrase.set(currentTheme.getPraseToString());
-            phrase.set(currentTheme.getPhrase().get(0));
-            playPhrase(0);
-        } catch (Exception e) {
-            isPlaying.set(false);
-        }
-    }
-
-    private void playPhrase(int index) {
-        try {
-            File tempMp3 = File.createTempFile("phrase", ".mp3", App.getContext().getCacheDir());
-            tempMp3.deleteOnExit();
-            FileOutputStream fos = new FileOutputStream(tempMp3);
-            fos.write(selectedTheme.get().getAudio().get(index));
-            fos.close();
-
-            mPlayer.reset();
-
-            FileInputStream fis = new FileInputStream(tempMp3);
-            mPlayer.setDataSource(fis.getFD());
-
-            mPlayer.prepare();
-            mPlayer.start();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -166,21 +131,7 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
                 mCheckout = Checkout.forActivity(activity, App.getContext().getBilling());
                 mCheckout.start();
                 reloadInventory();
-
                 reloadRecyclerView();
-
-/*
-                // Заполняется сетка
-                GridView gridView = (GridView) activity.findViewById(R.id.grid_view);
-                gridView.setAdapter(new ImageAdapter(activity, Loader.getMapTheme()));
-
-                // Пeреключается текущая тема
-                gridView.setOnItemClickListener((parent, v, position, id) -> {
-                    selectedTheme.set(Loader.getArrayTheme().get(position));
-                    CircleImageView civ = (CircleImageView) activity.findViewById(R.id.circleImageView);
-                    civ.setImageBitmap(selectedTheme.get().getPhotoBit());
-                });
-*/
 
                 selectedTheme.set(Loader.getMapTheme().firstEntry().getValue());
                 CircleImageView civ = (CircleImageView) activity.findViewById(R.id.circleImageView);
@@ -197,10 +148,6 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
     @Override
     public void onDestroy() {
         mCheckout.stop();
-        if (mPlayer.isPlaying()) {
-            stopPlay();
-        }
-        mPlayer.release();
         super.onDestroy();
     }
 
@@ -224,43 +171,20 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
         }
     }
 
-    //region Player
-    MediaPlayer mPlayer;
-
-    private int currentTrack;
-
     public void play() {
-        loadPhrase();
-       /* currentTrack = 0;
-        mPlayer = new MediaPlayer();
-        mPlayer.setOnCompletionListener(mp -> {
-            if (currentTrack < selectedTheme.get().getAudio().size()) {
-                phrase.set(selectedTheme.get().getPhrase().get(currentTrack));
-                playPhrase(currentTrack);
-            } else {
-                stopPlay();
-                mPlayer.release();
-            }
-            currentTrack++;
-        });
-        loadPhrase();
-        currentTrack++;*/
+        if (Media.item().getCurrentState() == Media.MediaState.inPause)
+            Media.item().play(null);
+        else
+            loadPhrase();
     }
 
     public void pause() {
         Media.item().pause();
-       /* mPlayer.pause();
-        isPaused.set(true);*/
     }
 
     public void stopPlay() {
         Media.item().stop();
-        /*isPlaying.set(false);
-        isPaused.set(false);
-        mPlayer.stop();*/
     }
-
-    //endregion
 
     //region Billing
 

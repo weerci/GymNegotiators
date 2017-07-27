@@ -153,7 +153,6 @@
                             android:layout_weight="1"
                             android:text="||"
                             android:theme="@style/AccentButton"
-                            android:enabled="@{viewModel.isPlaying}"
                             android:visibility="@{viewModel.selectedTheme.isPurchased &amp;&amp; viewModel.media.canPause ? v.VISIBLE : v.GONE}"
                             app:onClick="@{viewModel::pause}" />
                         <Button
@@ -170,7 +169,6 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="Stop"
-                            android:enabled="@{viewModel.isPlaying}"
                             android:theme="@style/AccentButton"
                             android:visibility="@{viewModel.selectedTheme.isPurchased &amp;&amp; viewModel.media.canStop ? v.VISIBLE : v.GONE}"
                             app:onClick="@{viewModel::stopPlay}" />
@@ -181,7 +179,7 @@
                             android:text="Stop"
                             android:theme="@style/NotActiveButton"
                             android:visibility="@{viewModel.selectedTheme.isPurchased &amp;&amp; !viewModel.media.canStop ? v.VISIBLE : v.GONE}"
-                            app:onClick="@{viewModel::stopPlay}" />
+                            />
 
                         <!--Button
                             android:layout_width="0dp"
@@ -191,6 +189,7 @@
                             android:theme="@style/AccentButton"
                             android:visibility="@{viewModel.selectedTheme.isPurchased ? v.VISIBLE : v.GONE}"
                             app:onClick="@{viewModel::buyTheme}" /-->
+
                     </LinearLayout>
 
                     <ProgressBar

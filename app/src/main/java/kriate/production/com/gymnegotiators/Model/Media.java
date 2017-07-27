@@ -30,11 +30,10 @@ public class Media {
     private static Media _media;
     private MediaPlayer mPlayer = new MediaPlayer();
 
-    public static Media item()
-    {
-        if ( _media == null)
+    public static Media item() {
+        if (_media == null)
             _media = new Media();
-        return  _media;
+        return _media;
     }
 
     //endregion
@@ -48,17 +47,21 @@ public class Media {
     //region Properties
 
     private MediaState mCurrentState = MediaState.inStop;
+    public MediaState getCurrentState() {
+        return mCurrentState;
+    }
+
     private int mCurrentTrack = 0;
     private int mCurrentPosition = 0;
     private List<Phrases> mPhrases = new ArrayList<>();
+
 
     //endregion
 
     //region Helper
 
-    private void erase()
-    {
-        mPhrases.clear();
+    private void erase() {
+        //mPhrases.clear();
         setObservableFields(true, false, false);
         mCurrentState = MediaState.inStop;
         mCurrentTrack = 0;
@@ -66,7 +69,7 @@ public class Media {
         mPlayer.release();
     }
 
-    private void setObservableFields(boolean canIsPlay, boolean canIsPause, boolean canIsStop){
+    private void setObservableFields(boolean canIsPlay, boolean canIsPause, boolean canIsStop) {
         canPlay.set(canIsPlay);
         canPause.set(canIsPause);
         canStop.set(canIsStop);
@@ -92,7 +95,7 @@ public class Media {
         }
     }
 
-    private void  startPlay(){
+    private void startPlay() {
         mCurrentTrack = 0;
         mPlayer = new MediaPlayer();
 
@@ -112,45 +115,41 @@ public class Media {
 
     //endregion
 
-    public void play(List<Phrases> phrases)
-    {
+    public void play(List<Phrases> phrases) {
         if (!canPlay.get())
             return;
 
-        mCurrentState = MediaState.inPlay;
-        setObservableFields(false, true, true);
+        try {
+            if (mCurrentState == MediaState.inPause) {
+                mPlayer.seekTo(mCurrentPosition);
+                mPlayer.start();
+            } else {
+                mPhrases = phrases;
+                startPlay();
+            }
+            mCurrentState = MediaState.inPlay;
+            setObservableFields(false, true, true);
 
-        if (mCurrentState == MediaState.inPause)
-        {
-            mPlayer.seekTo(mCurrentPosition);
-            mPlayer.start();
-        }
-        else {
-            mPhrases = phrases;
-            startPlay();
+        } catch (IllegalStateException e) {
+            erase();
         }
     }
 
-    public void pause()
-    {
+    public void pause() {
         if (!canPause.get())
             return;
-
-        mCurrentState = MediaState.inPause;
-        setObservableFields(true, false, true);
-
         mCurrentPosition = mPlayer.getCurrentPosition();
         mPlayer.pause();
 
+        mCurrentState = MediaState.inPause;
+        setObservableFields(true, false, true);
     }
 
-    public void stop()
-    {
+    public void stop() {
         try {
             mCurrentState = MediaState.inStop;
             mPlayer.stop();
-        }
-        finally {
+        } finally {
             erase();
         }
     }
