@@ -1,7 +1,5 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:bind="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
 
@@ -44,6 +42,16 @@
             android:paddingStart="@dimen/activity_horizontal_margin"
             android:paddingTop="@dimen/activity_horizontal_margin">
 
+            <ScrollView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/error_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </ScrollView>
+
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
@@ -58,7 +66,7 @@
                         android:layout_width="@dimen/avatar_size"
                         android:layout_height="@dimen/avatar_size"
                         app:civ_border_color="@color/colorPrimary"
-                        app:civ_border_width="1dp"/>
+                        app:civ_border_width="1dp" />
 
                     <View
                         android:layout_width="@dimen/indicator_size"
@@ -137,6 +145,7 @@
                             android:theme="@style/AccentButton"
                             android:visibility="@{viewModel.selectedTheme.isPurchased &amp;&amp; viewModel.media.canPlay ? v.VISIBLE : v.GONE}"
                             app:onClick="@{viewModel::play}" />
+
                         <Button
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -155,13 +164,14 @@
                             android:theme="@style/AccentButton"
                             android:visibility="@{viewModel.selectedTheme.isPurchased &amp;&amp; viewModel.media.canPause ? v.VISIBLE : v.GONE}"
                             app:onClick="@{viewModel::pause}" />
+
                         <Button
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="||"
                             android:theme="@style/NotActiveButton"
-                            android:visibility="@{viewModel.selectedTheme.isPurchased &amp;&amp; !viewModel.media.canPause ? v.VISIBLE : v.GONE}"/>
+                            android:visibility="@{viewModel.selectedTheme.isPurchased &amp;&amp; !viewModel.media.canPause ? v.VISIBLE : v.GONE}" />
 
                         <!--Кнопка остановки-->
                         <Button
@@ -172,14 +182,14 @@
                             android:theme="@style/AccentButton"
                             android:visibility="@{viewModel.selectedTheme.isPurchased &amp;&amp; viewModel.media.canStop ? v.VISIBLE : v.GONE}"
                             app:onClick="@{viewModel::stopPlay}" />
+
                         <Button
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="Stop"
                             android:theme="@style/NotActiveButton"
-                            android:visibility="@{viewModel.selectedTheme.isPurchased &amp;&amp; !viewModel.media.canStop ? v.VISIBLE : v.GONE}"
-                            />
+                            android:visibility="@{viewModel.selectedTheme.isPurchased &amp;&amp; !viewModel.media.canStop ? v.VISIBLE : v.GONE}" />
 
                         <!--Button
                             android:layout_width="0dp"
@@ -203,26 +213,26 @@
             </LinearLayout>
 
             <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:visibility="@{!viewModel.media.canStop ? v.VISIBLE : v.GONE}"
-                android:id="@+id/rv"
-                />
+                android:visibility="@{!viewModel.media.canStop ? v.VISIBLE : v.GONE}" />
 
             <!-- Отображает тевкст фразы-->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:visibility="@{viewModel.media.canStop ? v.VISIBLE : v.GONE}">
+
                 <ScrollView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
+
                     <TextView
                         style="@style/PhraseTextView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@{viewModel.media.currentPhrase}"
-                        />
+                        android:text="@{viewModel.media.currentPhrase}" />
                 </ScrollView>
             </LinearLayout>
 

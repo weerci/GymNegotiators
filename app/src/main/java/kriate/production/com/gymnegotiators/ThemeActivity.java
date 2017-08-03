@@ -10,6 +10,7 @@ import org.solovyev.android.checkout.Inventory;
 
 import java.io.IOException;
 
+import kriate.production.com.gymnegotiators.Utils.ExceptionHandler;
 import kriate.production.com.gymnegotiators.databinding.ActivityThemeBinding;
 
 
@@ -20,6 +21,7 @@ public class ThemeActivity extends BindingActivity<ActivityThemeBinding, ThemeAc
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
+
         getMenuInflater().inflate(R.menu.menu_theme, menu);
         return true;
     }
@@ -27,6 +29,7 @@ public class ThemeActivity extends BindingActivity<ActivityThemeBinding, ThemeAc
     @Override
     public ThemeActivityVM onCreate() {
         setSupportActionBar(getBinding().toolbar);
+        Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler(this));
 
         return new ThemeActivityVM(this, KEY_STATUS);
     }
