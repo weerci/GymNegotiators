@@ -221,7 +221,7 @@
                         style="@style/PhraseTextView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@{viewModel.media.currentPhrase}"
+                        android:text="@{viewModel.media.phrase}"
                         />
                 </ScrollView>
             </LinearLayout>

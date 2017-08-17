@@ -1,5 +1,6 @@
 package kriate.production.com.gymnegotiators.Model;
 
+import android.app.Activity;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
 import android.media.MediaPlayer;
@@ -11,29 +12,34 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
 import java.util.PrimitiveIterator;
 import java.util.StringTokenizer;
 
 import kriate.production.com.gymnegotiators.App;
+import kriate.production.com.gymnegotiators.Utils.AppUtilities;
 import kriate.production.com.gymnegotiators.fit.Phrases;
+import okhttp3.internal.Util;
 
 /**
  * Created by dima on 26.07.2017.
- * Предназначен для проигрывания музыкальной фразы и отображения
- * связанного с ней текста в Observable поле currentPhrase.
+ * Предназначен для проигрывания и отображения фраз, комментариев и ответов для выбранной темы.
  */
 
 public class Media {
 
     //region Constructors
 
-    private static Media _media;
+    private Activity _activity;
     private MediaPlayer mPlayer = new MediaPlayer();
+    private String _currentTrack; // Проигрываемый трек, в нераспарсеном формате
+    private int _currentPosition = 0; // Позиция в проигрываемом треке
+    private int _currentPhraseIdx; // Текущая фраза, в списке фраз темы
 
-    public static Media item() {
-        if (_media == null)
-            _media = new Media();
-        return _media;
+    public Media(Activity activity, Theme theme)
+    {
+        _activity = activity;
+        _theme = theme;
     }
 
     //endregion
@@ -41,19 +47,32 @@ public class Media {
     public ObservableBoolean canPlay = new ObservableBoolean(true);
     public ObservableBoolean canPause = new ObservableBoolean(false);
     public ObservableBoolean canStop = new ObservableBoolean(false);
-    public ObservableField<String> currentPhrase = new ObservableField<>();
-
+    public ObservableField<String> phrase = new ObservableField<>();
+    public ObservableField<String> comment = new ObservableField<>();
+    public ObservableField<String> answers = new ObservableField<>();
 
     //region Properties
 
-    private MediaState mCurrentState = MediaState.inStop;
-    public MediaState getCurrentState() {
-        return mCurrentState;
+    private Theme _theme;
+    public Theme getTheme() {
+        return _theme;
+    }
+    public void setTheme(Theme _theme) {
+        this._theme = _theme;
     }
 
-    private int mCurrentTrack = 0;
-    private int mCurrentPosition = 0;
-    private List<Phrases> mPhrases = new ArrayList<>();
+    private MediaState _currentState = MediaState.inStop;
+    public MediaState getCurrentState() {
+        return _currentState;
+    }
+
+    private Boolean _withComment = true;
+    public Boolean getWithComment() {
+        return _withComment;
+    }
+    public void setWithComment(Boolean _withComment) {
+        this._withComment = _withComment;
+    }
 
 
     //endregion
@@ -61,11 +80,11 @@ public class Media {
     //region Helper
 
     private void erase() {
-        //mPhrases.clear();
         setObservableFields(true, false, false);
-        mCurrentState = MediaState.inStop;
-        mCurrentTrack = 0;
-        mCurrentPosition = 0;
+        _currentState = MediaState.inStop;
+        _currentTrack = null;
+        _currentPosition = 0;
+        _currentPhrase = null;
         mPlayer.release();
     }
 
@@ -75,12 +94,15 @@ public class Media {
         canStop.set(canIsStop);
     }
 
-    private void playPhrase() {
+    private void play() {
+        if (_currentTrack == null)
+            return;
+
         try {
-            File tempMp3 = File.createTempFile("phrase", ".mp3", App.getContext().getCacheDir());
+            File tempMp3 = File.createTempFile("track", ".mp3", App.getContext().getCacheDir());
             tempMp3.deleteOnExit();
             FileOutputStream fos = new FileOutputStream(tempMp3);
-            fos.write(Base64.decode(mPhrases.get(mCurrentTrack).getAudio(), Base64.DEFAULT));
+            fos.write(Base64.decode(_currentTrack, Base64.DEFAULT));
             fos.close();
 
             mPlayer.reset();
@@ -95,41 +117,81 @@ public class Media {
         }
     }
 
-    private void startPlay() {
-        mCurrentTrack = 0;
-        mPlayer = new MediaPlayer();
-
-        mPlayer.setOnCompletionListener(mp -> {
-            if (mCurrentTrack < mPhrases.size()) {
-                currentPhrase.set(mPhrases.get(mCurrentTrack).getPhrase());
-                playPhrase();
-                mCurrentTrack++;
-            } else {
-                stop();
-            }
-        });
-        currentPhrase.set(mPhrases.get(mCurrentTrack).getPhrase());
-        playPhrase();
-        mCurrentTrack++;
-    }
-
     //endregion
 
-    public void play(List<Phrases> phrases) {
+    // Загружается отображение и прогирывание фразы под номером idx, либо продолжается воспроизведение, если MediaState.inPause is true
+    public void start() {
         if (!canPlay.get())
             return;
 
+        if(_theme.getPhrases().size() == 0){
+            AppUtilities.showSnackbar(_activity, "Не загружены аудио файлы фраз", false);
+            return;
+        }
+
+        if (_currentPhraseIdx >= _theme.getPhrases().size())
+            return;
+
         try {
-            if (mCurrentState == MediaState.inPause) {
-                mPlayer.seekTo(mCurrentPosition);
+            if (_currentState == MediaState.inPause) {
+                mPlayer.seekTo(_currentPosition);
                 mPlayer.start();
             } else {
-                mPhrases = phrases;
-                startPlay();
+                if (_withComment) {
+                    _currentTrack = _theme.getPhrases().get(_currentPhraseIdx).getCommentAudio();
+                    play();
+                    _currentTrack = _theme.getPhrases().get(_currentPhraseIdx).getAudio();
+                    play();
+                } else{
+                    _currentTrack = _theme.getPhrases().get(_currentPhraseIdx).getAudio();
+                    play();
+                }
             }
-            mCurrentState = MediaState.inPlay;
+            _currentState = MediaState.inPlay;
             setObservableFields(false, true, true);
+        } catch (IllegalStateException e) {
+            erase();
+        }
+    }
 
+    // Отображается и проигрывается следующая фраза из темы
+    public void next()
+    {
+        _currentPhraseIdx++;
+        start();
+    }
+
+    // Отображаются и проигрываются варианты ответов
+    public void answer()
+    {
+        if (!canPlay.get())
+            return;
+
+        if(_theme.getPhrases().size() == 0){
+            AppUtilities.showSnackbar(_activity, "Не загружены аудио файлы фраз", false);
+            return;
+        }
+
+        if (_currentPhraseIdx >= _theme.getPhrases().size())
+            return;
+
+        try {
+            if (_currentState == MediaState.inPause) {
+                mPlayer.seekTo(_currentPosition);
+                mPlayer.start();
+            } else {
+                if (_withComment) {
+                    _currentTrack = _theme.getPhrases().get(_currentPhraseIdx).getCommentAudio();
+                    play();
+                    _currentTrack = _theme.getPhrases().get(_currentPhraseIdx).getAudio();
+                    play();
+                } else{
+                    _currentTrack = _theme.getPhrases().get(_currentPhraseIdx).getAudio();
+                    play();
+                }
+            }
+            _currentState = MediaState.inPlay;
+            setObservableFields(false, true, true);
         } catch (IllegalStateException e) {
             erase();
         }
@@ -138,16 +200,16 @@ public class Media {
     public void pause() {
         if (!canPause.get())
             return;
-        mCurrentPosition = mPlayer.getCurrentPosition();
+        _currentPosition = mPlayer.getCurrentPosition();
         mPlayer.pause();
 
-        mCurrentState = MediaState.inPause;
+        _currentState = MediaState.inPause;
         setObservableFields(true, false, true);
     }
 
     public void stop() {
         try {
-            mCurrentState = MediaState.inStop;
+            _currentState = MediaState.inStop;
             mPlayer.stop();
         } finally {
             erase();

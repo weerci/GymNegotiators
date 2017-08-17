@@ -91,14 +91,13 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
 
     private void loadPhrase() {
         isLoading.set(true);
-        Theme currentTheme = Loader.getMapTheme().get(selectedTheme.get().getId());
-        if (currentTheme.getPhrase() == null) {
+        if (selectedTheme.get().getPhrases().size() == 0) {
             App.getFitService().getContent(selectedTheme.get().getId()).enqueue(new Callback<List<Phrases>>() {
                 @Override
                 public void onResponse(Call<List<Phrases>> call, Response<List<Phrases>> response) {
                     isLoading.set(false);
-                    Loader.setPhrases(currentTheme, response.body());
-                    Media.item().play(selectedTheme.get().getPhrases());
+                    selectedTheme.get().setPhrases(response.body());
+                    media.get().setTheme(selectedTheme.get());
                 }
 
                 @Override
@@ -108,7 +107,7 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
                 }
             });
         } else {
-            Media.item().play(selectedTheme.get().getPhrases());
+            media.get().setTheme(selectedTheme.get());
             isLoading.set(false);
         }
     }
@@ -118,7 +117,7 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
     public ThemeActivityVM(ThemeActivity activity, String status) {
         super(activity);
 
-        media.set(Media.item());
+        media.set(new Media(activity, null));
 
         // Загружаются темы
         App.getFitService().getAllContent().enqueue(new Callback<List<Content>>() {
@@ -172,18 +171,18 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
     }
 
     public void play() {
-        if (Media.item().getCurrentState() == Media.MediaState.inPause)
-            Media.item().play(null);
+        if (media.get().getCurrentState() == Media.MediaState.inPause)
+            media.get().start();
         else
             loadPhrase();
     }
 
     public void pause() {
-        Media.item().pause();
+        Media.item(activity).pause();
     }
 
     public void stopPlay() {
-        Media.item().stop();
+        Media.item(activity).stop();
     }
 
     //region Billing
@@ -215,6 +214,7 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
                     }
                 }
             }
+            Loader.getMapTheme().get("theme").getIsPurchased().set(true);
         }
     }
 

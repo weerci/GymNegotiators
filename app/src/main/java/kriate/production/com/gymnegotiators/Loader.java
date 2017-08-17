@@ -44,19 +44,6 @@ public final class Loader {
         }
     }
 
-    public static void setPhrases(Theme theme, List<Phrases> phrases) {
-        ArrayList<String> als = new ArrayList<>();
-        ArrayList<byte[]> alb = new ArrayList<>();
-        for (Phrases item : phrases) {
-            als.add(item.getPhrase());
-            alb.add(Base64.decode(item.getAudio(), Base64.DEFAULT));
-        }
-        theme.setPhrase(als);
-        theme.setAudio(alb);
-
-        theme.setPhrases(phrases);
-    }
-
     public static ArrayList<Theme> getArrayTheme() {
         return new ArrayList<>(mapTheme.values());
     }

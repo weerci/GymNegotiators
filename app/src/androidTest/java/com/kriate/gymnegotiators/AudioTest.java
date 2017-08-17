@@ -4,6 +4,7 @@ import android.app.Application;
 import android.test.ApplicationTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
 
+import kriate.production.com.gymnegotiators.App;
 import kriate.production.com.gymnegotiators.Model.Media;
 
 /**
@@ -17,7 +18,7 @@ public class AudioTest extends ApplicationTestCase<Application> {
 
     @SmallTest
     public void init_state_test() throws Exception {
-        Media media = Media.item();
+        Media media = Media.item(null);
 
         assertEquals(Media.MediaState.inStop, media.getCurrentState());
         assertEquals(true, media.canPlay.get());

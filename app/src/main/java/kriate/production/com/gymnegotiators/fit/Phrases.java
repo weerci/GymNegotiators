@@ -14,18 +14,12 @@ public class Phrases {
     public String getTheme_id() {
         return theme_id;
     }
-    public void setTheme_id(String theme_id) {
-        this.theme_id = theme_id;
-    }
 
     @SerializedName("ord")
     @Expose
     private String ord;
     public String getOrd() {
         return ord;
-    }
-    public void setOrd(String ord) {
-        this.ord = ord;
     }
 
     @SerializedName("audio")
@@ -34,9 +28,6 @@ public class Phrases {
     public String getAudio() {
         return audio;
     }
-    public void setAudio(String audio) {
-        this.audio = audio;
-    }
 
     @SerializedName("phrase")
     @Expose
@@ -44,8 +35,61 @@ public class Phrases {
     public String getPhrase() {
         return phrase;
     }
-    public void setPhrase(String phrase) {
-        this.phrase = phrase;
+
+    @SerializedName("comment")
+    @Expose
+    private String comment;
+    public String getComment() {
+        return comment;
+    }
+
+    @SerializedName("commentAudio")
+    @Expose
+    private String commentAudio;
+    public String getCommentAudio() {
+        return commentAudio;
+    }
+
+    @SerializedName("var1")
+    @Expose
+    private String var1;
+    public String getVar1() {
+        return var1;
+    }
+
+    @SerializedName("varAudio1")
+    @Expose
+    private String varAudio1;
+    public String getVarAudio1() {
+        return varAudio1;
+    }
+
+    @SerializedName("var2")
+    @Expose
+    private String var2;
+    public String getVar2() {
+        return var2;
+    }
+
+    @SerializedName("varAudio2")
+    @Expose
+    private String varAudio2;
+    public String getVarAudio2() {
+        return varAudio2;
+    }
+
+    @SerializedName("var3")
+    @Expose
+    private String var3;
+    public String getVar3() {
+        return var3;
+    }
+
+    @SerializedName("varAudio3")
+    @Expose
+    private String varAudio3;
+    public String getVarAudio3() {
+        return varAudio3;
     }
 
 }

@@ -2,16 +2,4 @@
     <string name="app_name">Тренажер переговорщика</string>
     <string name="action_settings">Настройки</string>
 
-    <string name="seller_head">С продавцом</string>
-    <string name="buyer_head">С покупателем</string>
-    <string name="boss_head">С начальником</string>
-    <string name="employer_head">С подчиненным</string>
-    <string name="list_head">Свой список</string>
-
-    <string name="seller_desk">Особенности ведения переговоров с продавцом</string>
-    <string name="buyer_desk">Особенности ведения переговоров с покупателем</string>
-    <string name="boss_desk">Особенности ведения переговоров с начальником</string>
-    <string name="employer_desk">Особенности ведения переговоров с подчиненным</string>
-    <string name="list_desk">Список избранных тем разговора</string>
-
 </resources>

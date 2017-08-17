@@ -1,15 +1,8 @@
 package kriate.production.com.gymnegotiators;
 
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import com.stfalcon.androidmvvmhelper.mvvm.activities.BindingActivity;
-
-import org.solovyev.android.checkout.Inventory;
-
-import java.io.IOException;
-
 import kriate.production.com.gymnegotiators.databinding.ActivityThemeBinding;
 
 
