@@ -35,6 +35,7 @@ public class Media {
     private String _currentTrack; // Проигрываемый трек, в нераспарсеном формате
     private int _currentPosition = 0; // Позиция в проигрываемом треке
     private int _currentPhraseIdx; // Текущая фраза, в списке фраз темы
+    private static int _idx = 0; // Переменная содержащая текущую позицию проигрываемого файла в последовательности
 
     public Media(Activity activity, Theme theme)
     {
@@ -117,10 +118,51 @@ public class Media {
         }
     }
 
+    private void playSequence(String[] sequence)
+    {
+        _idx = 0;
+        mPlayer.setOnCompletionListener(mp -> {
+            if (_idx <= sequence.length) {
+                _currentTrack = sequence[_idx];
+                play();
+                _idx++;
+            } else {
+                stop();
+            }
+        });
+        _currentTrack = sequence[_idx];
+        play();
+        _idx++;
+    }
+
     //endregion
 
+    public enum Plaing {answer, phrase};
+
+    private void whatPlay(Plaing plaing)
+    {
+        switch (plaing){
+            case phrase:
+                if (_withComment) {
+                    _currentTrack = _theme.getPhrases().get(_currentPhraseIdx).getCommentAudio();
+                    play();
+                    _currentTrack = _theme.getPhrases().get(_currentPhraseIdx).getAudio();
+                    play();
+                } else{
+                    _currentTrack = _theme.getPhrases().get(_currentPhraseIdx).getAudio();
+                    play();
+                }
+                break;
+            case answer:
+
+                break;
+        }
+
+
+    }
+
     // Загружается отображение и прогирывание фразы под номером idx, либо продолжается воспроизведение, если MediaState.inPause is true
-    public void start() {
+    public void start(Plaing plaing) {
         if (!canPlay.get())
             return;
 
@@ -137,15 +179,6 @@ public class Media {
                 mPlayer.seekTo(_currentPosition);
                 mPlayer.start();
             } else {
-                if (_withComment) {
-                    _currentTrack = _theme.getPhrases().get(_currentPhraseIdx).getCommentAudio();
-                    play();
-                    _currentTrack = _theme.getPhrases().get(_currentPhraseIdx).getAudio();
-                    play();
-                } else{
-                    _currentTrack = _theme.getPhrases().get(_currentPhraseIdx).getAudio();
-                    play();
-                }
             }
             _currentState = MediaState.inPlay;
             setObservableFields(false, true, true);
@@ -180,20 +213,24 @@ public class Media {
                 mPlayer.seekTo(_currentPosition);
                 mPlayer.start();
             } else {
-                if (_withComment) {
-                    _currentTrack = _theme.getPhrases().get(_currentPhraseIdx).getCommentAudio();
-                    play();
-                    _currentTrack = _theme.getPhrases().get(_currentPhraseIdx).getAudio();
-                    play();
-                } else{
-                    _currentTrack = _theme.getPhrases().get(_currentPhraseIdx).getAudio();
-                    play();
-                }
+                playPhrase();
             }
             _currentState = MediaState.inPlay;
             setObservableFields(false, true, true);
         } catch (IllegalStateException e) {
             erase();
+        }
+    }
+
+    private void playPhrase() {
+        if (_withComment) {
+            _currentTrack = _theme.getPhrases().get(_currentPhraseIdx).getCommentAudio();
+            play();
+            _currentTrack = _theme.getPhrases().get(_currentPhraseIdx).getAudio();
+            play();
+        } else{
+            _currentTrack = _theme.getPhrases().get(_currentPhraseIdx).getAudio();
+            play();
         }
     }
 
