@@ -18,11 +18,5 @@ public class AudioTest extends ApplicationTestCase<Application> {
 
     @SmallTest
     public void init_state_test() throws Exception {
-        Media media = Media.item(null);
-
-        assertEquals(Media.MediaState.inStop, media.getCurrentState());
-        assertEquals(true, media.canPlay.get());
-        assertEquals(false, media.canPause.get());
-        assertEquals(false, media.canStop.get());
     }
 }

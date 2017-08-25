@@ -1,6 +1,7 @@
 package kriate.production.com.gymnegotiators;
 
 import android.app.Application;
+import android.content.SharedPreferences;
 
 import org.solovyev.android.checkout.Billing;
 import kriate.production.com.gymnegotiators.Utils.Encryption;
@@ -13,6 +14,13 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 
 public class App extends Application {
+
+    // region Init file имя файла настройки
+    public static final String APP_PREFERENCES = "settings";
+    public static final Boolean APP_PREFERENCES_WITH_COMMENT = true;
+    private SharedPreferences mSettings;
+
+    // endregion
 
     public App() {
         instance = this;
@@ -30,6 +38,7 @@ public class App extends Application {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         fitService = retrofit.create(FitService.class);
+        mSettings = getSharedPreferences(APP_PREFERENCES, instance.MODE_PRIVATE);
     }
 
     // Context

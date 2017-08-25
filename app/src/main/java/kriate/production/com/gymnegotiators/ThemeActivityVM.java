@@ -98,6 +98,7 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
                     isLoading.set(false);
                     selectedTheme.get().setPhrases(response.body());
                     media.get().setTheme(selectedTheme.get());
+                    media.get().start(Media.Playing.phrase);
                 }
 
                 @Override
@@ -172,17 +173,17 @@ public class ThemeActivityVM extends ActivityViewModel<ThemeActivity> {
 
     public void play() {
         if (media.get().getCurrentState() == Media.MediaState.inPause)
-            media.get().start();
+            media.get().start(null);
         else
             loadPhrase();
     }
 
     public void pause() {
-        Media.item(activity).pause();
+        media.get().pause();
     }
 
     public void stopPlay() {
-        Media.item(activity).stop();
+        media.get().stop();
     }
 
     //region Billing

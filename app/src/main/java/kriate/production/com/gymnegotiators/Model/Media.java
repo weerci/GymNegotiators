@@ -85,7 +85,7 @@ public class Media {
         _currentState = MediaState.inStop;
         _currentTrack = null;
         _currentPosition = 0;
-        _currentPhrase = null;
+        _currentPhraseIdx = 0;
         mPlayer.release();
     }
 
@@ -118,8 +118,8 @@ public class Media {
         }
     }
 
-    private void playSequence(String[] sequence)
-    {
+    // Проигрывает переданную в параметре последовательность файлов
+    private void playSequence(String[] sequence){
         _idx = 0;
         mPlayer.setOnCompletionListener(mp -> {
             if (_idx <= sequence.length) {
@@ -135,34 +135,12 @@ public class Media {
         _idx++;
     }
 
+    public enum Playing {answer, phrase}
+
     //endregion
 
-    public enum Plaing {answer, phrase};
-
-    private void whatPlay(Plaing plaing)
-    {
-        switch (plaing){
-            case phrase:
-                if (_withComment) {
-                    _currentTrack = _theme.getPhrases().get(_currentPhraseIdx).getCommentAudio();
-                    play();
-                    _currentTrack = _theme.getPhrases().get(_currentPhraseIdx).getAudio();
-                    play();
-                } else{
-                    _currentTrack = _theme.getPhrases().get(_currentPhraseIdx).getAudio();
-                    play();
-                }
-                break;
-            case answer:
-
-                break;
-        }
-
-
-    }
-
     // Загружается отображение и прогирывание фразы под номером idx, либо продолжается воспроизведение, если MediaState.inPause is true
-    public void start(Plaing plaing) {
+    public void start(Playing playing) {
         if (!canPlay.get())
             return;
 
@@ -175,10 +153,25 @@ public class Media {
             return;
 
         try {
-            if (_currentState == MediaState.inPause) {
-                mPlayer.seekTo(_currentPosition);
-                mPlayer.start();
-            } else {
+            switch (playing){
+                case phrase:
+                    if (_withComment)
+                        playSequence(new String[]{_theme.getPhrases().get(_currentPhraseIdx).getCommentAudio(), _theme.getPhrases().get(_currentPhraseIdx).getAudio()});
+                    else
+                        playSequence(new String[]{_theme.getPhrases().get(_currentPhraseIdx).getAudio()});
+                    break;
+                case answer:
+                    playSequence(new String[]{
+                            _theme.getPhrases().get(_currentPhraseIdx).getVar1(),
+                            _theme.getPhrases().get(_currentPhraseIdx).getVar2(),
+                            _theme.getPhrases().get(_currentPhraseIdx).getVar3()});
+                    break;
+                default:
+                    if (_currentState == MediaState.inPause) {
+                        mPlayer.seekTo(_currentPosition);
+                        mPlayer.start();
+                    }
+                    break;
             }
             _currentState = MediaState.inPlay;
             setObservableFields(false, true, true);
@@ -191,49 +184,10 @@ public class Media {
     public void next()
     {
         _currentPhraseIdx++;
-        start();
+        start(Playing.phrase);
     }
 
-    // Отображаются и проигрываются варианты ответов
-    public void answer()
-    {
-        if (!canPlay.get())
-            return;
-
-        if(_theme.getPhrases().size() == 0){
-            AppUtilities.showSnackbar(_activity, "Не загружены аудио файлы фраз", false);
-            return;
-        }
-
-        if (_currentPhraseIdx >= _theme.getPhrases().size())
-            return;
-
-        try {
-            if (_currentState == MediaState.inPause) {
-                mPlayer.seekTo(_currentPosition);
-                mPlayer.start();
-            } else {
-                playPhrase();
-            }
-            _currentState = MediaState.inPlay;
-            setObservableFields(false, true, true);
-        } catch (IllegalStateException e) {
-            erase();
-        }
-    }
-
-    private void playPhrase() {
-        if (_withComment) {
-            _currentTrack = _theme.getPhrases().get(_currentPhraseIdx).getCommentAudio();
-            play();
-            _currentTrack = _theme.getPhrases().get(_currentPhraseIdx).getAudio();
-            play();
-        } else{
-            _currentTrack = _theme.getPhrases().get(_currentPhraseIdx).getAudio();
-            play();
-        }
-    }
-
+    // Прекращается проигрывание текущего фрагмента, состояние плейера сохраняется, при нажатии кнопки play воспроизведение продолжается с места останова
     public void pause() {
         if (!canPause.get())
             return;
@@ -244,6 +198,7 @@ public class Media {
         setObservableFields(true, false, true);
     }
 
+    // Останавливается проигрывание фразы или ответа, состояние плейера сбрасывается на начальное
     public void stop() {
         try {
             _currentState = MediaState.inStop;
